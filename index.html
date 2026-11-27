@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
+  @property --angle { syntax:"<angle>"; inherits:false; initial-value:0deg; }
+
   :root {
     --bg:#050a18; --card:#0c1430; --line:rgba(120,160,255,.16); --text:#f3f6ff; --muted:#9aa8c7;
     --accent:#2f8bff; --accent2:#5ec2ff; --gold:#e7b75a;
@@ -36,7 +38,7 @@
 
   .wrap { position:relative; z-index:1; max-width:1200px; margin:0 auto; padding:0 24px; }
 
-  /* ----- Entrance: items start scattered below, rise after ~2s, set by ~3s ----- */
+  /* ----- Falling-in entrance: items start scattered and settle into place ----- */
   .enter { animation:settle .85s cubic-bezier(.2,.8,.2,1) both; animation-delay:var(--d, 2s); }
   @keyframes settle {
     from { opacity:1; transform:translate(var(--x,0px), var(--y,260px)) rotate(var(--r,0deg)); }
@@ -85,6 +87,7 @@
   .avatar-inner img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
   .handle { position:absolute; bottom:-8px; background:rgba(12,20,48,.9); border:1px solid var(--line); padding:8px 16px; border-radius:999px; font-size:.92rem; color:var(--text); }
   @keyframes spin { to { transform:rotate(360deg); } }
+  @keyframes spin-back { to { transform:rotate(-360deg); } }
 
   /* ----- Sections ----- */
   .block { padding:60px 0 10px; }
@@ -93,11 +96,13 @@
   .sec-head h2 { margin:0; font-size:clamp(1.7rem,3.4vw,2.2rem); font-weight:800; }
 
   .bot-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:20px; }
-  .bot { position:relative; text-decoration:none; background:var(--card); border:1px solid var(--line); border-radius:22px; padding:26px 22px 22px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:8px; transition:transform .25s, border-color .25s, box-shadow .25s; overflow:hidden; }
+  .bot { position:relative; text-decoration:none; background:var(--card); border:1px solid var(--line); border-radius:22px; padding:0 0 22px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:8px; transition:transform .25s, border-color .25s, box-shadow .25s; overflow:hidden; }
   .bot::before { content:""; position:absolute; inset:0 0 auto 0; height:3px; background:var(--c); }
   .bot:hover { transform:translateY(-6px); border-color:var(--c); box-shadow:0 18px 40px -16px var(--c); }
   .live-badge { position:absolute; top:14px; right:14px; font-size:.7rem; font-weight:700; color:#2ee59d; background:rgba(46,229,157,.12); border:1px solid rgba(46,229,157,.35); padding:3px 9px; border-radius:999px; }
-  .bot-av { width:96px; height:96px; border-radius:50%; padding:4px; background:var(--c); box-shadow:0 0 28px -4px var(--c); margin-top:6px; }
+  .bot-media { width:100%; aspect-ratio:16/10; object-fit:cover; display:block; background:#050a18; border-radius:22px 22px 0 0; }
+  .bot-av { width:96px; height:96px; border-radius:50%; padding:4px; background:var(--c); box-shadow:0 0 28px -4px var(--c); margin-top:-48px; position:relative; z-index:2; border:4px solid var(--card); }
+  .bot > h3, .bot > .uname, .bot > .bio, .bot > .open { padding:0 22px; }
   .bot-av img, .av-fb { width:100%; height:100%; border-radius:50%; object-fit:cover; background:#1a2550; display:grid; place-items:center; font-size:2rem; font-weight:800; color:var(--c); }
   .bot h3 { margin:10px 0 0; font-size:1.05rem; font-weight:700; word-break:break-word; }
   .uname { color:var(--c); font-size:.9rem; font-weight:600; }
@@ -148,7 +153,7 @@
 </div>
 
 <div class="wrap">
-  <nav class="top enter">
+  <nav class="top enter" style="--d:.6s">
     <a class="brand" href="#top">
       <span class="logo"><svg viewBox="0 0 24 24"><path d="M9.8 15.2 9.6 19c.4 0 .6-.2.8-.4l2-1.9 4.1 3c.8.4 1.3.2 1.5-.7l2.7-12.7c.3-1.2-.4-1.7-1.2-1.4L2.4 10.1c-1.2.5-1.2 1.1-.2 1.4l4.2 1.3 9.7-6.1c.5-.3.9-.1.5.2z"/></svg></span>
       <span><b>BOTS BY <em>ANKIT</em></b><small>Telegram Bot Creator</small></span>
@@ -164,41 +169,41 @@
 
   <header class="hero" id="top">
     <div>
-      <span class="pill enter">⭐ Telegram Bot Creator</span>
+      <span class="pill enter" style="--d:.9s">⭐ Telegram Bot Creator</span>
       <h1>
-        <span class="enter">Useful Telegram bots.</span><br>
-        <span class="enter">Built by <em>Ankit.</em></span>
+        <span class="enter" style="--d:1s">Useful Telegram bots.</span><br>
+        <span class="enter" style="--d:1.15s">Built by <em>Ankit.</em></span>
       </h1>
-      <p class="lead enter">Simple, smart bots made to make everyday tasks easier.</p>
+      <p class="lead enter" style="--d:1.3s">Simple, smart bots made to make everyday tasks easier.</p>
       <div class="cta">
-        <a class="btn-primary enter" href="#bots">Explore My Bots →</a>
-        <a class="btn-ghost enter" id="ctaTg" href="#" target="_blank" rel="noopener">Join Telegram</a>
+        <a class="btn-primary enter" style="--d:1.45s" href="#bots">Explore My Bots →</a>
+        <a class="btn-ghost enter" style="--d:1.55s" id="ctaTg" href="#" target="_blank" rel="noopener">Join Telegram</a>
       </div>
-      <div class="live enter"><span class="dot"></span><span id="typed"></span><span class="caret"></span></div>
+      <div class="live enter" style="--d:1.7s"><span class="dot"></span><span id="typed"></span><span class="caret"></span></div>
     </div>
 
     <div class="hero-art">
-      <div class="orbit enter keep"></div>
-      <div class="plane enter">
+      <div class="orbit enter keep" style="--d:.8s"></div>
+      <div class="plane enter" style="--d:1s">
         <svg viewBox="0 0 24 24"><path d="M9.8 15.2 9.6 19c.4 0 .6-.2.8-.4l2-1.9 4.1 3c.8.4 1.3.2 1.5-.7l2.7-12.7c.3-1.2-.4-1.7-1.2-1.4L2.4 10.1c-1.2.5-1.2 1.1-.2 1.4l4.2 1.3 9.7-6.1c.5-.3.9-.1.5.2z"/></svg>
       </div>
-      <div class="avatar-ring enter keep">
+      <div class="avatar-ring enter keep" style="--d:1.2s">
         <div class="avatar-inner">
           <span id="myLetter"></span>
           <img id="myPhoto" alt="Ankit">
         </div>
       </div>
-      <div class="handle enter" id="handle"></div>
+      <div class="handle enter" style="--d:1.9s" id="handle"></div>
     </div>
   </header>
 
   <section class="block" id="bots">
-    <div class="sec-head enter"><span class="line"></span><h2>My Telegram <em>Bots</em></h2></div>
+    <div class="sec-head enter" style="--d:1.2s"><span class="line"></span><h2>My Telegram <em>Bots</em></h2></div>
     <div class="bot-grid" id="botGrid"></div>
   </section>
 
   <section class="two" id="channels">
-    <div class="panel enter">
+    <div class="panel enter" style="--d:1.4s">
       <h3>What I <em>Build</em></h3>
       <p>Telegram automation, useful tools and bot updates.</p>
       <ul class="feat">
@@ -207,19 +212,19 @@
         <li><i>🔔</i><div><b>Bot Updates</b><span>Stay connected for updates</span></div></li>
       </ul>
     </div>
-    <div class="panel enter">
+    <div class="panel enter" style="--d:1.6s">
       <h3>Join Our <em>Channels</em></h3>
       <p>Get the latest updates, new bots and important announcements.</p>
       <div id="chanList"></div>
     </div>
   </section>
 
-  <section class="block enter" id="about">
+  <section class="block enter" id="about" style="--d:1.8s">
     <div class="sec-head"><span class="line"></span><h2>About <em>Me</em></h2></div>
     <p class="about" id="aboutText"></p>
   </section>
 
-  <footer class="enter">
+  <footer class="enter" style="--d:2s">
     <span><b>BOTS BY ANKIT</b> &nbsp;|&nbsp; Telegram Bot Creator</span>
     <span>© 2026 Ankit. All rights reserved.</span>
     <a id="footTg" href="#" target="_blank" rel="noopener"></a>
@@ -248,9 +253,9 @@ const CHANNELS = [
 // bio: the bot's Bio text
 // photo: local file next to index.html (leave empty to use the bot's Telegram photo)
 const BOTS = [
-  { display: "𝐅𝐑𝐎𝐍𝐓 𝐌𝐄𝐃𝐈𝐀 <||>", username: "Name_style_maker_bot", bio: "Make your name stylish ✨ Tons of unique designs, cool fonts & symbols, and ready-made bios.", photo: "name-style.jpg" },
-  { display: "⌁ ᖴ ᴜ s ꭵ ꭷ и",        username: "Groupsecurity_xbot",   bio: "Fusion is a group management bot that keeps your group clean, safe and organised.", photo: "group-security.jpg" },
-  { display: "𓆩 𝙔𝙐𝙏𝘼 𝙎𝙀𝘾𝙐𝙍𝙄𝙏𝙔 🛡️ 𓆪", username: "Yutasecurebot",        bio: "AI-powered NSFW content moderator for Telegram groups. Removes explicit content instantly.", photo: "yuta-secure.jpg" }
+  { display: "𝐅𝐑𝐎𝐍𝐓 𝐌𝐄𝐃𝐈𝐀 <||>", username: "Name_style_maker_bot", bio: "Make your name stylish ✨ Tons of unique designs, cool fonts & symbols, and ready-made bios.", photo: "name-style.jpg", video: "robot-name.mp4" },
+  { display: "⌁ ᖴ ᴜ s ꭵ ꭷ и",        username: "Groupsecurity_xbot",   bio: "Fusion is a group management bot that keeps your group clean, safe and organised.", photo: "group-security.jpg", video: "robot-fusion.mp4" },
+  { display: "𓆩 𝙔𝙐𝙏𝘼 𝙎𝙀𝘾𝙐𝙍𝙄𝙏𝙔 🛡️ 𓆪", username: "Yutasecurebot",        bio: "AI-powered NSFW content moderator for Telegram groups. Removes explicit content instantly.", photo: "yuta-secure.jpg", video: "robot-yuta.mp4" }
 ];
 // ===============================
 
@@ -271,7 +276,7 @@ function avatarHTML(srcs, letter, cls) {
     onerror="const r=this.dataset.rest?this.dataset.rest.split('|'):[];if(r.length){this.dataset.rest=r.slice(1).join('|');this.src=r[0];}else{this.replaceWith(Object.assign(document.createElement('div'),{className:'av-fb',textContent:this.dataset.letter}));}">`;
 }
 
-// Gives every .enter element a random start position below its place (never from above)
+// Gives every .enter element a random "fallen" start position
 function prepareEnter(root) {
   root.querySelectorAll(".enter:not(.done)").forEach(el => {
     if (!el.style.getPropertyValue("--x")) {
@@ -297,7 +302,8 @@ function render() {
   const myImg = document.getElementById("myPhoto");
   const myLetter = document.getElementById("myLetter");
   myLetter.textContent = ME.name.charAt(0).toUpperCase();
-  myImg.src = `https://t.me/i/userpic/320/${encodeURIComponent(ME.handle.replace("@", ""))}.jpg?v=${Date.now()}`;
+  const ownerSrc = `https://t.me/i/userpic/320/${encodeURIComponent(ME.handle.replace("@", ""))}.jpg?v=${Date.now()}`;
+  myImg.src = ownerSrc;
   myImg.addEventListener("error", function once() {
     myImg.removeEventListener("error", once);
     myImg.addEventListener("error", () => { myImg.style.display = "none"; });
@@ -310,8 +316,9 @@ function render() {
     const letter = (b.display || b.username).trim().charAt(0).toUpperCase();
     const tgPhoto = `https://t.me/i/userpic/320/${encodeURIComponent(b.username)}.jpg`;
     return `
-      <a class="bot enter" style="--c:${color}" href="https://t.me/${encodeURIComponent(b.username)}" target="_blank" rel="noopener">
+      <a class="bot enter" style="--c:${color};--d:${(1.2 + i * 0.12).toFixed(2)}s" href="https://t.me/${encodeURIComponent(b.username)}" target="_blank" rel="noopener">
         <span class="live-badge">● LIVE</span>
+        <video class="bot-media" src="${esc(b.video)}" autoplay muted loop playsinline preload="auto"></video>
         <div class="bot-av">${avatarHTML([b.photo, tgPhoto], letter, "")}</div>
         <h3>${esc(b.display)}</h3>
         <div class="uname">@${esc(b.username)}</div>
@@ -364,9 +371,7 @@ render();
 
 // After the entrance animation ends, hand control back so hover effects work
 document.addEventListener("animationend", e => {
-  if (e.animationName === "settle" && e.target.classList && e.target.classList.contains("enter") && !e.target.classList.contains("keep")) {
-    e.target.classList.add("done");
-  }
+  if (e.animationName === "settle" && e.target.classList && e.target.classList.contains("enter") && !e.target.classList.contains("keep")) e.target.classList.add("done");
 }, true);
 </script>
 </body>
