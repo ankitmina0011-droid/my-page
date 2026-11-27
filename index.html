@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bots by Ankit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  @property --angle { syntax:"<angle>"; inherits:false; initial-value:0deg; }
+
+  :root {
+    --bg:#050a18; --card:#0c1430; --line:rgba(120,160,255,.16); --text:#f3f6ff; --muted:#9aa8c7;
+    --accent:#2f8bff; --accent2:#5ec2ff; --gold:#e7b75a;
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:"Inter", system-ui, -apple-system, sans-serif; line-height:1.5; overflow-x:hidden; }
+  a { color:inherit; }
+
+  /* ----- Premium colour-shifting background ----- */
+  .bgfx { position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; background:var(--bg); }
+  .bgfx::after { content:""; position:absolute; inset:0; background:linear-gradient(rgba(5,10,24,.6), rgba(5,10,24,.88)); }
+  .blob { position:absolute; width:62vmax; height:62vmax; border-radius:50%; filter:blur(110px); opacity:.4; animation:drift 28s ease-in-out infinite alternate, hue 24s ease-in-out infinite; }
+  .b1 { top:-18%; left:-14%; animation-duration:30s, 24s; animation-name:drift1, gold; }
+  .b2 { top:30%; right:-22%; animation-duration:34s, 28s; animation-name:drift2, blueRed; }
+  .b3 { bottom:-24%; left:12%; animation-duration:26s, 32s; animation-name:drift3, greenBlue; }
+  .b4 { top:6%; left:38%; width:48vmax; height:48vmax; animation-duration:22s, 26s; animation-name:drift4, redGold; }
+  @keyframes drift1 { 0%,100% { transform:translate(0,0); } 50% { transform:translate(18vw,12vh); } }
+  @keyframes drift2 { 0%,100% { transform:translate(0,0); } 50% { transform:translate(-20vw,-10vh); } }
+  @keyframes drift3 { 0%,100% { transform:translate(0,0); } 50% { transform:translate(16vw,-14vh); } }
+  @keyframes drift4 { 0%,100% { transform:translate(0,0); } 50% { transform:translate(-14vw,16vh); } }
+  @keyframes hue { }
+  @keyframes gold { 0% { background-color:#d9a441; } 33% { background-color:#f1d27a; } 66% { background-color:#8fd9b0; } 100% { background-color:#d9a441; } }
+  @keyframes blueRed { 0% { background-color:#2f6fdb; } 50% { background-color:#b8232f; } 100% { background-color:#2f6fdb; } }
+  @keyframes greenBlue { 0% { background-color:#3ddc97; } 50% { background-color:#1e3a8a; } 100% { background-color:#3ddc97; } }
+  @keyframes redGold { 0% { background-color:#e04a4a; } 50% { background-color:#f1d27a; } 100% { background-color:#e04a4a; } }
+
+  .wrap { position:relative; z-index:1; max-width:1200px; margin:0 auto; padding:0 24px; }
+
+  /* ----- Falling-in entrance: items start scattered and settle into place ----- */
+  .enter { animation:settle .85s cubic-bezier(.2,.8,.2,1) both; animation-delay:var(--d, 2s); }
+  @keyframes settle {
+    from { opacity:1; transform:translate(var(--x,0px), var(--y,260px)) rotate(var(--r,0deg)); }
+    to   { opacity:1; transform:none; }
+  }
+  .enter.done { animation:none; opacity:1; transform:none; }
+
+  /* ----- Opening intro ----- */
+  .intro-screen { position:fixed; inset:0; z-index:100000; display:grid; place-items:center; padding:24px; background:#020307; opacity:1; visibility:visible; transition:opacity .85s ease, visibility .85s ease; }
+  .intro-screen.hide { opacity:0; visibility:hidden; pointer-events:none; }
+  .intro-content { width:min(760px,100%); display:grid; gap:12px; }
+  .intro-box { min-height:76px; display:flex; align-items:center; overflow:hidden; padding:10px 18px; border:1px solid rgba(238,244,255,.78); background:rgba(255,255,255,.015); box-shadow:0 0 22px rgba(255,255,255,.035), inset 0 0 18px rgba(255,255,255,.025); clip-path:inset(0 100% 0 0); animation:introBoxDraw .8s cubic-bezier(.6,0,.3,1) forwards; }
+  .intro-box:nth-child(2) { animation-delay:.38s; }
+  .intro-box:nth-child(3) { animation-delay:.76s; }
+  .intro-word { display:block; width:100%; color:#f5f7ff; font-family:Impact,"Arial Narrow",sans-serif; font-size:clamp(2rem,8vw,5rem); font-weight:900; letter-spacing:.045em; line-height:1.05; text-transform:uppercase; transform:translateY(115%); animation:introWordReveal .75s cubic-bezier(.16,1,.3,1) forwards; animation-delay:.48s; }
+  .intro-box:nth-child(2) .intro-word { animation-delay:.86s; }
+  .intro-box:nth-child(3) .intro-word { animation-delay:1.24s; }
+  .intro-word.outline { color:transparent; -webkit-text-stroke:1.5px #f5f7ff; }
+  @keyframes introBoxDraw { to { clip-path:inset(0 0 0 0); } }
+  @keyframes introWordReveal { to { transform:translateY(0); } }
+
+  /* ----- Nav ----- */
+  nav.top { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:18px 0; border-bottom:1px solid var(--line); }
+  .brand { display:flex; align-items:center; gap:12px; text-decoration:none; }
+  .logo { width:44px; height:44px; border-radius:12px; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:grid; place-items:center; box-shadow:0 8px 24px rgba(47,139,255,.35); }
+  .logo svg { width:24px; height:24px; fill:#fff; }
+  .brand b { display:block; font-size:1.05rem; letter-spacing:.02em; }
+  .brand b em { font-style:normal; color:var(--accent2); }
+  .brand small { color:var(--muted); font-size:.8rem; }
+  .links { display:flex; gap:26px; font-size:.95rem; }
+  .links a { text-decoration:none; color:var(--muted); }
+  .links a:hover, .links a.active { color:var(--accent2); }
+  .btn-sm { text-decoration:none; background:var(--accent); color:#fff; padding:10px 18px; border-radius:999px; font-weight:600; font-size:.9rem; white-space:nowrap; box-shadow:0 8px 22px rgba(47,139,255,.35); }
+
+  /* ----- Hero ----- */
+  .hero { display:grid; grid-template-columns:1.1fr .9fr; gap:40px; align-items:center; padding:56px 0 30px; min-height:70vh; }
+  .pill { display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid var(--line); font-size:.9rem; color:var(--text); }
+  h1 { font-size:clamp(2.4rem, 5.4vw, 4.2rem); line-height:1.08; font-weight:800; letter-spacing:-.02em; margin:22px 0 16px; }
+  h1 em, .sec-head em, .panel h3 em { font-style:normal; color:var(--accent); }
+  h1 .enter { display:inline-block; }
+  .lead { color:var(--muted); font-size:1.12rem; max-width:520px; margin:0; }
+  .cta { display:flex; gap:14px; flex-wrap:wrap; margin-top:28px; }
+  .btn-primary, .btn-ghost { text-decoration:none; padding:14px 24px; border-radius:999px; font-weight:700; font-size:.98rem; display:inline-flex; align-items:center; gap:8px; }
+  .btn-primary { background:var(--accent); color:#fff; box-shadow:0 12px 30px rgba(47,139,255,.4); }
+  .btn-ghost { border:1px solid rgba(255,255,255,.2); color:var(--text); background:rgba(255,255,255,.03); }
+  .live { margin-top:28px; display:inline-flex; align-items:center; gap:10px; padding:10px 16px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid var(--line); color:var(--text); font-size:.95rem; min-height:44px; }
+  .live .dot { width:8px; height:8px; border-radius:50%; background:#2ee59d; box-shadow:0 0 10px #2ee59d; animation:blink 1.4s infinite; }
+  .caret { display:inline-block; width:7px; height:1em; background:var(--accent2); vertical-align:-2px; margin-left:2px; animation:blink .9s steps(1) infinite; }
+  @keyframes blink { 50% { opacity:0; } }
+
+  .hero-art { position:relative; display:grid; place-items:center; min-height:460px; }
+  .orbit { position:absolute; width:min(460px,90vw); aspect-ratio:1; border-radius:50%; border:2px dashed rgba(94,194,255,.35); }
+  .orbit.enter { animation:settle .85s cubic-bezier(.2,.8,.2,1) var(--d) both, spin 26s linear 3.2s infinite; }
+  .orbit::after { content:""; position:absolute; width:14px; height:14px; border-radius:50%; background:var(--accent2); top:-7px; left:50%; box-shadow:0 0 18px var(--accent2); }
+  .plane { position:absolute; width:min(300px,62vw); top:-20px; right:-10px; }
+  .plane svg { width:100%; height:auto; fill:var(--accent); filter:drop-shadow(0 20px 40px rgba(47,139,255,.45)); }
+  .avatar-ring { position:absolute; width:min(250px,60vw); aspect-ratio:1; border-radius:50%; padding:6px; background:conic-gradient(var(--accent2),var(--accent),#7a5cff,var(--accent2)); box-shadow:0 0 60px rgba(47,139,255,.45); }
+  .avatar-ring.enter { animation:settle .85s cubic-bezier(.2,.8,.2,1) var(--d) both; }
+  .avatar-inner { position:absolute; inset:6px; border-radius:50%; background:var(--card); overflow:hidden; display:grid; place-items:center; font-size:4.5rem; font-weight:800; color:var(--accent2); }
+  .avatar-inner img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .handle { position:absolute; bottom:-8px; background:rgba(12,20,48,.9); border:1px solid var(--line); padding:8px 16px; border-radius:999px; font-size:.92rem; color:var(--text); }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  @keyframes spin-back { to { transform:rotate(-360deg); } }
+
+  /* ----- Three continuously animated desk widgets ----- */
+  .desk-widgets { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; padding:22px 0 12px; }
+  .desk-card { position:relative; min-width:0; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:13px; min-height:225px; padding:22px 18px; text-align:center; text-decoration:none; color:var(--text); background:linear-gradient(155deg,rgba(7,12,27,.96),rgba(12,20,48,.96)); border:1px solid rgba(160,185,235,.22); border-radius:15px; box-shadow:0 12px 30px rgba(0,0,0,.18); transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease; }
+  .desk-card:hover { transform:translateY(-5px); border-color:rgba(244,237,37,.65); box-shadow:0 14px 36px rgba(244,237,37,.08); }
+  .desk-card h3 { margin:0; font-size:1rem; letter-spacing:.12em; font-weight:800; }
+  .desk-card p { max-width:290px; margin:0; color:var(--muted); font-size:.78rem; line-height:1.55; }
+  .desk-tag { color:#f4ed25; font-size:.65rem; font-weight:800; letter-spacing:.13em; }
+  .widget-yellow { color:#f4ed25; }
+
+  /* Desk Buddy: two glowing animated eyes */
+  .buddy-face { position:relative; width:112px; height:78px; display:flex; align-items:center; justify-content:center; gap:15px; border:2px solid rgba(238,244,255,.75); border-radius:14px; background:#05070d; box-shadow:0 0 18px rgba(255,255,255,.06),inset 0 0 18px rgba(255,255,255,.035); }
+  .buddy-face::before { content:""; position:absolute; width:35px; height:12px; left:50%; bottom:-14px; transform:translateX(-50%); border:2px solid rgba(238,244,255,.55); border-top:0; border-radius:0 0 5px 5px; }
+  .buddy-eye { width:17px; height:27px; border-radius:5px; background:#f4ed25; box-shadow:0 0 13px rgba(244,237,37,.9),0 0 25px rgba(244,237,37,.35); animation:buddyBlink 3.2s infinite; }
+  .buddy-eye:nth-child(2) { animation-delay:.12s; }
+  @keyframes buddyBlink { 0%,43%,47%,100% { transform:scaleY(1); opacity:1; } 45% { transform:scaleY(.12); opacity:.65; } }
+
+  /* Desk Radar: needle sweeps across a 0-100 scale */
+  .radar-gauge { width:180px; height:102px; position:relative; overflow:hidden; }
+  .radar-gauge svg { display:block; width:180px; height:110px; overflow:visible; }
+  .radar-needle { transform-origin:100px 100px; transform:rotate(-90deg); transition:transform .04s linear; }
+  .radar-readout { margin-top:-1px; color:#f4ed25; font-size:1.05rem; font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:.05em; }
+  .radar-scale { position:absolute; left:8px; right:8px; bottom:0; display:flex; justify-content:space-between; color:#9aa8c7; font-size:.58rem; }
+
+  /* Spotify Mini: miniature screen with an always-moving equalizer */
+  .spotify-device { width:92px; height:86px; padding:9px; display:flex; flex-direction:column; justify-content:space-between; border:2px solid rgba(238,244,255,.72); border-radius:9px; background:#05070d; box-shadow:0 0 18px rgba(255,255,255,.05); }
+  .spotify-screen { height:25px; border:1px solid rgba(244,237,37,.65); background:rgba(244,237,37,.1); display:flex; align-items:center; justify-content:center; gap:5px; }
+  .spotify-screen i { width:4px; height:10px; border-radius:2px; background:#f4ed25; box-shadow:0 0 8px rgba(244,237,37,.5); animation:miniPulse .7s ease-in-out infinite alternate; }
+  .spotify-screen i:nth-child(2) { height:16px; animation-delay:.18s; }
+  .spotify-screen i:nth-child(3) { height:7px; animation-delay:.32s; }
+  .spotify-screen i:nth-child(4) { height:13px; animation-delay:.48s; }
+  .spotify-bars { height:24px; display:flex; align-items:center; justify-content:center; gap:4px; }
+  .spotify-bars span { display:block; width:5px; height:7px; border-radius:2px; background:#f4ed25; box-shadow:0 0 8px rgba(244,237,37,.5); animation:spotifyEqualize .65s ease-in-out infinite alternate; }
+  .spotify-bars span:nth-child(2n) { animation-delay:.16s; }
+  .spotify-bars span:nth-child(3n) { animation-delay:.31s; }
+  .spotify-bars span:nth-child(4n) { animation-delay:.45s; }
+  @keyframes miniPulse { from { opacity:.35; } to { opacity:1; } }
+  @keyframes spotifyEqualize { from { height:5px; } to { height:23px; } }
+
+  /* ----- Sections ----- */
+  .block { padding:60px 0 10px; }
+  .sec-head { display:flex; align-items:center; gap:14px; margin-bottom:26px; }
+  .sec-head .line { width:44px; height:3px; background:var(--accent); border-radius:3px; }
+  .sec-head h2 { margin:0; font-size:clamp(1.7rem,3.4vw,2.2rem); font-weight:800; }
+  .bot-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:20px; }
+  .bot { position:relative; text-decoration:none; background:var(--card); border:1px solid var(--line); border-radius:22px; padding:0 0 22px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:8px; transition:transform .25s, border-color .25s, box-shadow .25s; overflow:hidden; }
+  .bot::before { content:""; position:absolute; inset:0 0 auto 0; height:3px; background:var(--c); }
+  .bot:hover { transform:translateY(-6px); border-color:var(--c); box-shadow:0 18px 40px -16px var(--c); }
+  .live-badge { position:absolute; top:14px; right:14px; font-size:.7rem; font-weight:700; color:#2ee59d; background:rgba(46,229,157,.12); border:1px solid rgba(46,229,157,.35); padding:3px 9px; border-radius:999px; }
+  .bot-media { width:100%; aspect-ratio:16/10; object-fit:cover; display:block; background:#050a18; border-radius:22px 22px 0 0; }
+  .bot-av { width:96px; height:96px; border-radius:50%; padding:4px; background:var(--c); box-shadow:0 0 28px -4px var(--c); margin-top:-48px; position:relative; z-index:2; border:4px solid var(--card); }
+  .bot > h3, .bot > .uname, .bot > .bio, .bot > .open { padding:0 22px; }
+  .bot-av img, .av-fb { width:100%; height:100%; border-radius:50%; object-fit:cover; background:#1a2550; display:grid; place-items:center; font-size:2rem; font-weight:800; color:var(--c); }
+  .bot h3 { margin:10px 0 0; font-size:1.05rem; font-weight:700; word-break:break-word; }
+  .uname { color:var(--c); font-size:.9rem; font-weight:600; }
+  .bio { color:var(--muted); font-size:.88rem; margin:2px 0 6px; }
+  .open { margin-top:auto; color:var(--c); font-weight:700; font-size:.9rem; }
+
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:20px; padding-top:60px; }
+  .panel { position:relative; overflow:hidden; background:linear-gradient(160deg, rgba(20,34,80,.9), rgba(10,16,38,.95)); border:1px solid var(--line); border-radius:22px; padding:30px; }
+  .panel h3 { margin:0 0 8px; font-size:1.6rem; font-weight:800; }
+  .panel > p { color:var(--muted); margin:0 0 18px; }
+  .feat { list-style:none; padding:0; margin:0; display:grid; gap:14px; }
+  .feat li { display:flex; gap:12px; align-items:flex-start; }
+  .feat b { display:block; }
+  .feat span { color:var(--muted); font-size:.92rem; }
+  .feat i { font-style:normal; width:38px; height:38px; flex:0 0 38px; border-radius:12px; background:rgba(47,139,255,.15); display:grid; place-items:center; color:var(--accent2); font-weight:700; }
+
+  .chan { display:flex; align-items:center; gap:14px; padding:12px; border-radius:16px; background:rgba(255,255,255,.03); border:1px solid var(--line); text-decoration:none; margin-bottom:12px; transition:border-color .2s; }
+  .chan:hover { border-color:var(--accent2); }
+  .chan-av { width:52px; height:52px; flex:0 0 52px; border-radius:50%; object-fit:cover; background:#1a2550; display:grid; place-items:center; font-weight:800; color:var(--accent2); overflow:hidden; }
+  .chan-av img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+  .chan b { display:block; font-size:.98rem; }
+  .chan small { color:var(--muted); }
+  .chan .join { margin-left:auto; background:var(--accent); color:#fff; padding:8px 14px; border-radius:999px; font-size:.85rem; font-weight:700; white-space:nowrap; }
+
+  .about { color:var(--muted); max-width:720px; }
+  footer { margin-top:60px; padding:26px 0 36px; border-top:1px solid var(--line); display:flex; justify-content:space-between; flex-wrap:wrap; gap:14px; color:var(--muted); font-size:.92rem; }
+  footer b { color:var(--text); }
+  footer a { color:var(--accent2); text-decoration:none; }
+
+  @media (max-width:880px) {
+    .hero { grid-template-columns:1fr; text-align:center; }
+    .lead { margin:0 auto; }
+    .cta { justify-content:center; }
+    .live { justify-content:center; }
+    .links { display:none; }
+    .two { grid-template-columns:1fr; }
+    .hero-art { min-height:380px; }
+  }
+  @media (max-width:680px) {
+    .desk-widgets { grid-template-columns:1fr; gap:14px; }
+    .desk-card { min-height:205px; }
+    .intro-box { min-height:66px; padding:9px 13px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation:none !important; transition:none !important; }
+    .enter { opacity:1; transform:none; }
+    .intro-screen { display:none !important; }
+    .radar-needle { transform:rotate(0deg); }
+  }
+</style>
+</head>
+<body>
+<div class="bgfx" aria-hidden="true">
+  <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span><span class="blob b4"></span>
+</div>
+
+<!-- Opening animation: blank dark screen, boxes draw, then words reveal -->
+<div class="intro-screen" id="introScreen" aria-label="Welcome to Bots by Ankit">
+  <div class="intro-content">
+    <div class="intro-box"><span class="intro-word outline">WELCOME</span></div>
+    <div class="intro-box"><span class="intro-word">BOTS BY ANKIT</span></div>
+    <div class="intro-box"><span class="intro-word outline">AUTOMATION</span></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <nav class="top enter" style="--d:.6s">
+    <a class="brand" href="#top">
+      <span class="logo"><svg viewBox="0 0 24 24"><path d="M9.8 15.2 9.6 19c.4 0 .6-.2.8-.4l2-1.9 4.1 3c.8.4 1.3.2 1.5-.7l2.7-12.7c.3-1.2-.4-1.7-1.2-1.4L2.4 10.1c-1.2.5-1.2 1.1-.2 1.4l4.2 1.3 9.7-6.1c.5-.3.9-.1.5.2z"/></svg></span>
+      <span><b>BOTS BY <em>ANKIT</em></b><small>Telegram Bot Creator</small></span>
+    </a>
+    <div class="links">
+      <a href="#top" class="active">Home</a>
+      <a href="#bots">My Bots</a>
+      <a href="#channels">Channels</a>
+      <a href="#about">About</a>
+    </div>
+    <a class="btn-sm" id="navTg" href="#" target="_blank" rel="noopener">Open Telegram →</a>
+  </nav>
+
+  <header class="hero" id="top">
+    <div>
+      <span class="pill enter" style="--d:.9s">⭐ Telegram Bot Creator</span>
+      <h1>
+        <span class="enter" style="--d:1s">Useful Telegram bots.</span><br>
+        <span class="enter" style="--d:1.15s">Built by <em>Ankit.</em></span>
+      </h1>
+      <p class="lead enter" style="--d:1.3s">Simple, smart bots made to make everyday tasks easier.</p>
+      <div class="cta">
+        <a class="btn-primary enter" style="--d:1.45s" href="#bots">Explore My Bots →</a>
+        <a class="btn-ghost enter" style="--d:1.55s" id="ctaTg" href="#" target="_blank" rel="noopener">Join Telegram</a>
+      </div>
+      <div class="live enter" style="--d:1.7s"><span class="dot"></span><span id="typed"></span><span class="caret"></span></div>
+    </div>
+
+    <div class="hero-art">
+      <div class="orbit enter keep" style="--d:.8s"></div>
+      <div class="plane enter" style="--d:1s">
+        <svg viewBox="0 0 24 24"><path d="M9.8 15.2 9.6 19c.4 0 .6-.2.8-.4l2-1.9 4.1 3c.8.4 1.3.2 1.5-.7l2.7-12.7c.3-1.2-.4-1.7-1.2-1.4L2.4 10.1c-1.2.5-1.2 1.1-.2 1.4l4.2 1.3 9.7-6.1c.5-.3.9-.1.5.2z"/></svg>
+      </div>
+      <div class="avatar-ring enter keep" style="--d:1.2s">
+        <div class="avatar-inner">
+          <span id="myLetter"></span>
+          <img id="myPhoto" alt="Ankit">
+        </div>
+      </div>
+      <div class="handle enter" style="--d:1.9s" id="handle"></div>
+    </div>
+  </header>
+
+  <!-- Three widgets inspired by the last part of the reference video -->
+  <section class="desk-widgets" aria-label="Animated desk widgets">
+    <article class="desk-card">
+      <div class="buddy-face" aria-hidden="true"><span class="buddy-eye"></span><span class="buddy-eye"></span></div>
+      <h3>DESK BUDDY</h3>
+      <p>A tiny desk companion with two glowing eyes, blinking continuously.</p>
+      <span class="desk-tag">● ONLINE</span>
+    </article>
+
+    <article class="desk-card">
+      <div class="radar-gauge" aria-label="Animated radar gauge from zero to one hundred">
+        <svg viewBox="0 0 200 115" role="img" aria-hidden="true">
+          <path d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="rgba(220,230,255,.3)" stroke-width="3"/>
+          <path d="M30 100 A70 70 0 0 1 170 100" fill="none" stroke="#f4ed25" stroke-width="2" stroke-dasharray="3 5"/>
+          <path d="M48 100 A52 52 0 0 1 152 100" fill="none" stroke="rgba(244,237,37,.22)" stroke-width="2"/>
+          <g stroke="#aab5cf" stroke-width="2">
+            <line x1="20" y1="100" x2="28" y2="100"/><line x1="100" y1="20" x2="100" y2="29"/><line x1="180" y1="100" x2="172" y2="100"/>
+          </g>
+          <line id="radarNeedle" class="radar-needle" x1="100" y1="100" x2="100" y2="30" stroke="#f4ed25" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="100" cy="100" r="6" fill="#f4ed25"/>
+        </svg>
+        <div class="radar-scale"><span>0</span><span>50</span><span>100</span></div>
+      </div>
+      <div class="radar-readout"><span id="radarValue">0</span> / 100</div>
+      <h3>DESK RADAR</h3>
+      <p>A live 0–100 meter. Its needle sweeps forward and returns endlessly.</p>
+      <span class="desk-tag">● SCANNING</span>
+    </article>
+
+    <article class="desk-card">
+      <div class="spotify-device" aria-hidden="true">
+        <div class="spotify-screen"><i></i><i></i><i></i><i></i></div>
+        <div class="spotify-bars">
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+      <h3>SPOTIFY MINI</h3>
+      <p>A miniature music-style display with a continuously moving equalizer.</p>
+      <span class="desk-tag">● PLAYING</span>
+    </article>
+  </section>
+
+  <section class="block" id="bots">
+    <div class="sec-head enter" style="--d:1.2s"><span class="line"></span><h2>My Telegram <em>Bots</em></h2></div>
+    <div class="bot-grid" id="botGrid"></div>
+  </section>
+
+  <section class="two" id="channels">
+    <div class="panel enter" style="--d:1.4s">
+      <h3>What I <em>Build</em></h3>
+      <p>Telegram automation, useful tools and bot updates.</p>
+      <ul class="feat">
+        <li><i>⚡</i><div><b>Telegram Automation</b><span>Smart bots for everyday use</span></div></li>
+        <li><i>🛠</i><div><b>Useful Tools</b><span>Tools to make life easier</span></div></li>
+        <li><i>🔔</i><div><b>Bot Updates</b><span>Stay connected for updates</span></div></li>
+      </ul>
+    </div>
+    <div class="panel enter" style="--d:1.6s">
+      <h3>Join Our <em>Channels</em></h3>
+      <p>Get the latest updates, new bots and important announcements.</p>
+      <div id="chanList"></div>
+    </div>
+  </section>
+
+  <section class="block enter" id="about" style="--d:1.8s">
+    <div class="sec-head"><span class="line"></span><h2>About <em>Me</em></h2></div>
+    <p class="about" id="aboutText"></p>
+  </section>
+
+  <footer class="enter" style="--d:2s">
+    <span><b>BOTS BY ANKIT</b> &nbsp;|&nbsp; Telegram Bot Creator</span>
+    <span>© 2026 Ankit. All rights reserved.</span>
+    <a id="footTg" href="#" target="_blank" rel="noopener"></a>
+  </footer>
+</div>
+
+<script>
+// ===== Edit your info here =====
+const ME = {
+  name: "Ankit",
+  telegram: "https://t.me/ankit_x_x_1",
+  handle: "@ankit_x_x_1",
+  about: "I build Telegram bots that make everyday tasks easier: group management, music, security and useful tools. Every bot is simple to use and fast to open."
+};
+
+// display: channel name (copied from the channel's Telegram name)
+// username: without @
+// photo: local file next to index.html
+const CHANNELS = [
+  { display: "𝐘ᴜᴛᴀ 𝐁ᴏᴛ 𝐇ᴜʙ", username: "yutabothub", photo: "channel-1.jpg" },
+  { display: "𝐋ᴇᴀᴅ 𝐁ʏ 𝐀ɴᴋɪᴛ", username: "X_Ankitsopurts", photo: "channel-2.jpg" }
+];
+
+// display: bot's display name (its Telegram name)
+// username: bot's @username, without @
+// bio: the bot's Bio text
+// photo: local file next to index.html (leave empty to use the bot's Telegram photo)
+const BOTS = [
+  { display: "𝐅𝐑𝐎𝐍𝐓 𝐌𝐄𝐃𝐈𝐀 <||>", username: "Name_style_maker_bot", bio: "Make your name stylish ✨ Tons of unique designs, cool fonts & symbols, and ready-made bios.", photo: "name-style.jpg", video: "robot-name.mp4" },
+  { display: "⌁ ᖴ ᴜ s ꭵ ꭷ и",        username: "Groupsecurity_xbot",   bio: "Fusion is a group management bot that keeps your group clean, safe and organised.", photo: "group-security.jpg", video: "robot-fusion.mp4" },
+  { display: "𓆩 𝙔𝙐𝙏𝘼 𝙎𝙀𝘾𝙐𝙍𝙄𝙏𝙔 🛡️ 𓆪", username: "Yutasecurebot",        bio: "AI-powered NSFW content moderator for Telegram groups. Removes explicit content instantly.", photo: "yuta-secure.jpg", video: "robot-yuta.mp4" }
+];
+// ===============================
+
+const COLORS = ["#2f8bff", "#5ec2ff", "#7a5cff", "#2ee59d", "#e7b75a"];
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, c =>
+    ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+}
+function rand(min, max) { return Math.random() * (max - min) + min; }
+
+// Picture with fallbacks: first src, then second, then the letter
+function avatarHTML(srcs, letter, cls) {
+  const list = srcs.filter(Boolean).map(esc);
+  const first = list[0] || "";
+  const rest = list.slice(1).join("|");
+  return `<img class="${cls}" src="${first}" alt="" data-letter="${esc(letter)}" data-rest="${rest}"
+    onerror="const r=this.dataset.rest?this.dataset.rest.split('|'):[];if(r.length){this.dataset.rest=r.slice(1).join('|');this.src=r[0];}else{this.replaceWith(Object.assign(document.createElement('div'),{className:'av-fb',textContent:this.dataset.letter}));}">`;
+}
+
+// Gives every .enter element a random "fallen" start position
+function prepareEnter(root) {
+  root.querySelectorAll(".enter:not(.done)").forEach(el => {
+    if (!el.style.getPropertyValue("--x")) {
+      el.style.setProperty("--x", Math.round(rand(-150, 150)) + "px");
+      el.style.setProperty("--y", Math.round(rand(200, 360)) + "px");
+      el.style.setProperty("--r", Math.round(rand(-25, 25)) + "deg");
+    }
+    el.style.setProperty("--d", (2 + rand(0, 0.15)).toFixed(2) + "s");
+  });
+}
+
+function render() {
+  // Nav / hero / buttons
+  document.getElementById("navTg").href = ME.telegram;
+  document.getElementById("ctaTg").href = ME.telegram;
+  document.getElementById("footTg").href = ME.telegram;
+  document.getElementById("footTg").textContent = ME.handle;
+  document.getElementById("handle").textContent = ME.handle;
+  document.getElementById("aboutText").textContent = ME.about;
+  document.title = `Bots by ${ME.name}`;
+
+  // Owner photo: fetched from the Telegram username each visit, then local file, then letter
+  const myImg = document.getElementById("myPhoto");
+  const myLetter = document.getElementById("myLetter");
+  myLetter.textContent = ME.name.charAt(0).toUpperCase();
+  const ownerSrc = `https://t.me/i/userpic/320/${encodeURIComponent(ME.handle.replace("@", ""))}.jpg?v=${Date.now()}`;
+  myImg.src = ownerSrc;
+  myImg.addEventListener("error", function once() {
+    myImg.removeEventListener("error", once);
+    myImg.addEventListener("error", () => { myImg.style.display = "none"; });
+    myImg.src = "profile.jpg";
+  });
+
+  // Bots
+  document.getElementById("botGrid").innerHTML = BOTS.map((b, i) => {
+    const color = COLORS[i % COLORS.length];
+    const letter = (b.display || b.username).trim().charAt(0).toUpperCase();
+    const tgPhoto = `https://t.me/i/userpic/320/${encodeURIComponent(b.username)}.jpg`;
+    return `
+      <a class="bot enter" style="--c:${color};--d:${(1.2 + i * 0.12).toFixed(2)}s" href="https://t.me/${encodeURIComponent(b.username)}" target="_blank" rel="noopener">
+        <span class="live-badge">● LIVE</span>
+        <video class="bot-media" src="${esc(b.video)}" autoplay muted loop playsinline preload="auto"></video>
+        <div class="bot-av">${avatarHTML([b.photo, tgPhoto], letter, "")}</div>
+        <h3>${esc(b.display)}</h3>
+        <div class="uname">@${esc(b.username)}</div>
+        <p class="bio">${esc(b.bio)}</p>
+        <span class="open">Open Bot →</span>
+      </a>`;
+  }).join("");
+
+  // Channels
+  document.getElementById("chanList").innerHTML = CHANNELS.map(c => {
+    const tgPhoto = `https://t.me/i/userpic/320/${encodeURIComponent(c.username)}.jpg`;
+    return `
+      <a class="chan" href="https://t.me/${encodeURIComponent(c.username)}" target="_blank" rel="noopener">
+        <div class="chan-av">${avatarHTML([c.photo, tgPhoto], c.display.charAt(0), "")}</div>
+        <div><b>${esc(c.display)}</b><small>@${esc(c.username)}</small></div>
+        <span class="join">Join →</span>
+      </a>`;
+  }).join("");
+
+  prepareEnter(document);
+  startTyping();
+}
+
+// "Live" typing text
+function startTyping() {
+  const lines = [
+    ...BOTS.map(b => `Building ${b.display} · @${b.username}`),
+    ...CHANNELS.map(c => `Posting updates to @${c.username}`),
+    "Shipping the next release…"
+  ];
+  const el = document.getElementById("typed");
+  let li = 0, ci = 0, deleting = false;
+  function tick() {
+    const line = lines[li];
+    if (!deleting) {
+      ci++;
+      el.textContent = line.slice(0, ci);
+      if (ci === line.length) { deleting = true; return setTimeout(tick, 1600); }
+      return setTimeout(tick, 45);
+    }
+    ci--;
+    el.textContent = line.slice(0, ci);
+    if (ci === 0) { deleting = false; li = (li + 1) % lines.length; return setTimeout(tick, 300); }
+    setTimeout(tick, 20);
+  }
+  tick();
+}
+
+// Opening intro stays briefly, then reveals the unchanged website.
+function startIntro() {
+  const intro = document.getElementById("introScreen");
+  if (!intro) return;
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduceMotion) {
+    intro.remove();
+    return;
+  }
+  window.setTimeout(() => {
+    intro.classList.add("hide");
+    window.setTimeout(() => intro.remove(), 950);
+  }, 3900);
+}
+
+// Desk Radar: smoothly sweeps from 0 to 100 and back forever.
+function startRadar() {
+  const needle = document.getElementById("radarNeedle");
+  const valueEl = document.getElementById("radarValue");
+  if (!needle || !valueEl) return;
+  let value = 0;
+  let direction = 1;
+  window.setInterval(() => {
+    value += direction;
+    if (value >= 100) { value = 100; direction = -1; }
+    if (value <= 0) { value = 0; direction = 1; }
+    const angle = -90 + (value * 1.8);
+    needle.style.transform = `rotate(${angle}deg)`;
+    valueEl.textContent = String(value);
+  }, 24);
+}
+
+render();
+startIntro();
+startRadar();
+
+// After the entrance animation ends, hand control back so hover effects work
+ document.addEventListener("animationend", e => {
+  if (e.animationName === "settle" && e.target.classList && e.target.classList.contains("enter") && !e.target.classList.contains("keep")) e.target.classList.add("done");
+}, true);
+</script>
+</body>
+</html>
