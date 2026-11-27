@@ -46,6 +46,20 @@
   }
   .enter.done { animation:none; opacity:1; transform:none; }
 
+  /* ----- Opening intro ----- */
+  .intro-screen { position:fixed; inset:0; z-index:100000; display:grid; place-items:center; padding:24px; background:#020307; opacity:1; visibility:visible; transition:opacity .85s ease, visibility .85s ease; }
+  .intro-screen.hide { opacity:0; visibility:hidden; pointer-events:none; }
+  .intro-content { width:min(760px,100%); display:grid; gap:12px; }
+  .intro-box { min-height:76px; display:flex; align-items:center; overflow:hidden; padding:10px 18px; border:1px solid rgba(238,244,255,.78); background:rgba(255,255,255,.015); box-shadow:0 0 22px rgba(255,255,255,.035), inset 0 0 18px rgba(255,255,255,.025); clip-path:inset(0 100% 0 0); animation:introBoxDraw .8s cubic-bezier(.6,0,.3,1) forwards; }
+  .intro-box:nth-child(2) { animation-delay:.38s; }
+  .intro-box:nth-child(3) { animation-delay:.76s; }
+  .intro-word { display:block; width:100%; color:#f5f7ff; font-family:Impact,"Arial Narrow",sans-serif; font-size:clamp(2rem,8vw,5rem); font-weight:900; letter-spacing:.045em; line-height:1.05; text-transform:uppercase; transform:translateY(115%); animation:introWordReveal .75s cubic-bezier(.16,1,.3,1) forwards; animation-delay:.48s; }
+  .intro-box:nth-child(2) .intro-word { animation-delay:.86s; }
+  .intro-box:nth-child(3) .intro-word { animation-delay:1.24s; }
+  .intro-word.outline { color:transparent; -webkit-text-stroke:1.5px #f5f7ff; }
+  @keyframes introBoxDraw { to { clip-path:inset(0 0 0 0); } }
+  @keyframes introWordReveal { to { transform:translateY(0); } }
+
   /* ----- Nav ----- */
   nav.top { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:18px 0; border-bottom:1px solid var(--line); }
   .brand { display:flex; align-items:center; gap:12px; text-decoration:none; }
@@ -89,12 +103,49 @@
   @keyframes spin { to { transform:rotate(360deg); } }
   @keyframes spin-back { to { transform:rotate(-360deg); } }
 
+  /* ----- Three continuously animated desk widgets ----- */
+  .desk-widgets { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; padding:22px 0 12px; }
+  .desk-card { position:relative; min-width:0; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:13px; min-height:225px; padding:22px 18px; text-align:center; text-decoration:none; color:var(--text); background:linear-gradient(155deg,rgba(7,12,27,.96),rgba(12,20,48,.96)); border:1px solid rgba(160,185,235,.22); border-radius:15px; box-shadow:0 12px 30px rgba(0,0,0,.18); transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease; }
+  .desk-card:hover { transform:translateY(-5px); border-color:rgba(244,237,37,.65); box-shadow:0 14px 36px rgba(244,237,37,.08); }
+  .desk-card h3 { margin:0; font-size:1rem; letter-spacing:.12em; font-weight:800; }
+  .desk-card p { max-width:290px; margin:0; color:var(--muted); font-size:.78rem; line-height:1.55; }
+  .desk-tag { color:#f4ed25; font-size:.65rem; font-weight:800; letter-spacing:.13em; }
+  .widget-yellow { color:#f4ed25; }
+
+  /* Desk Buddy: two glowing animated eyes */
+  .buddy-face { position:relative; width:112px; height:78px; display:flex; align-items:center; justify-content:center; gap:15px; border:2px solid rgba(238,244,255,.75); border-radius:14px; background:#05070d; box-shadow:0 0 18px rgba(255,255,255,.06),inset 0 0 18px rgba(255,255,255,.035); }
+  .buddy-face::before { content:""; position:absolute; width:35px; height:12px; left:50%; bottom:-14px; transform:translateX(-50%); border:2px solid rgba(238,244,255,.55); border-top:0; border-radius:0 0 5px 5px; }
+  .buddy-eye { width:17px; height:27px; border-radius:5px; background:#f4ed25; box-shadow:0 0 13px rgba(244,237,37,.9),0 0 25px rgba(244,237,37,.35); animation:buddyBlink 3.2s infinite; }
+  .buddy-eye:nth-child(2) { animation-delay:.12s; }
+  @keyframes buddyBlink { 0%,43%,47%,100% { transform:scaleY(1); opacity:1; } 45% { transform:scaleY(.12); opacity:.65; } }
+
+  /* Desk Radar: needle sweeps across a 0-100 scale */
+  .radar-gauge { width:180px; height:102px; position:relative; overflow:hidden; }
+  .radar-gauge svg { display:block; width:180px; height:110px; overflow:visible; }
+  .radar-needle { transform-origin:100px 100px; transform:rotate(-90deg); transition:transform .04s linear; }
+  .radar-readout { margin-top:-1px; color:#f4ed25; font-size:1.05rem; font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:.05em; }
+  .radar-scale { position:absolute; left:8px; right:8px; bottom:0; display:flex; justify-content:space-between; color:#9aa8c7; font-size:.58rem; }
+
+  /* Spotify Mini: miniature screen with an always-moving equalizer */
+  .spotify-device { width:92px; height:86px; padding:9px; display:flex; flex-direction:column; justify-content:space-between; border:2px solid rgba(238,244,255,.72); border-radius:9px; background:#05070d; box-shadow:0 0 18px rgba(255,255,255,.05); }
+  .spotify-screen { height:25px; border:1px solid rgba(244,237,37,.65); background:rgba(244,237,37,.1); display:flex; align-items:center; justify-content:center; gap:5px; }
+  .spotify-screen i { width:4px; height:10px; border-radius:2px; background:#f4ed25; box-shadow:0 0 8px rgba(244,237,37,.5); animation:miniPulse .7s ease-in-out infinite alternate; }
+  .spotify-screen i:nth-child(2) { height:16px; animation-delay:.18s; }
+  .spotify-screen i:nth-child(3) { height:7px; animation-delay:.32s; }
+  .spotify-screen i:nth-child(4) { height:13px; animation-delay:.48s; }
+  .spotify-bars { height:24px; display:flex; align-items:center; justify-content:center; gap:4px; }
+  .spotify-bars span { display:block; width:5px; height:7px; border-radius:2px; background:#f4ed25; box-shadow:0 0 8px rgba(244,237,37,.5); animation:spotifyEqualize .65s ease-in-out infinite alternate; }
+  .spotify-bars span:nth-child(2n) { animation-delay:.16s; }
+  .spotify-bars span:nth-child(3n) { animation-delay:.31s; }
+  .spotify-bars span:nth-child(4n) { animation-delay:.45s; }
+  @keyframes miniPulse { from { opacity:.35; } to { opacity:1; } }
+  @keyframes spotifyEqualize { from { height:5px; } to { height:23px; } }
+
   /* ----- Sections ----- */
   .block { padding:60px 0 10px; }
   .sec-head { display:flex; align-items:center; gap:14px; margin-bottom:26px; }
   .sec-head .line { width:44px; height:3px; background:var(--accent); border-radius:3px; }
   .sec-head h2 { margin:0; font-size:clamp(1.7rem,3.4vw,2.2rem); font-weight:800; }
-
   .bot-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:20px; }
   .bot { position:relative; text-decoration:none; background:var(--card); border:1px solid var(--line); border-radius:22px; padding:0 0 22px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:8px; transition:transform .25s, border-color .25s, box-shadow .25s; overflow:hidden; }
   .bot::before { content:""; position:absolute; inset:0 0 auto 0; height:3px; background:var(--c); }
@@ -141,15 +192,31 @@
     .two { grid-template-columns:1fr; }
     .hero-art { min-height:380px; }
   }
+  @media (max-width:680px) {
+    .desk-widgets { grid-template-columns:1fr; gap:14px; }
+    .desk-card { min-height:205px; }
+    .intro-box { min-height:66px; padding:9px 13px; }
+  }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation:none !important; transition:none !important; }
     .enter { opacity:1; transform:none; }
+    .intro-screen { display:none !important; }
+    .radar-needle { transform:rotate(0deg); }
   }
 </style>
 </head>
 <body>
 <div class="bgfx" aria-hidden="true">
   <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span><span class="blob b4"></span>
+</div>
+
+<!-- Opening animation: blank dark screen, boxes draw, then words reveal -->
+<div class="intro-screen" id="introScreen" aria-label="Welcome to Bots by Ankit">
+  <div class="intro-content">
+    <div class="intro-box"><span class="intro-word outline">WELCOME</span></div>
+    <div class="intro-box"><span class="intro-word">BOTS BY ANKIT</span></div>
+    <div class="intro-box"><span class="intro-word outline">AUTOMATION</span></div>
+  </div>
 </div>
 
 <div class="wrap">
@@ -196,6 +263,48 @@
       <div class="handle enter" style="--d:1.9s" id="handle"></div>
     </div>
   </header>
+
+  <!-- Three widgets inspired by the last part of the reference video -->
+  <section class="desk-widgets" aria-label="Animated desk widgets">
+    <article class="desk-card">
+      <div class="buddy-face" aria-hidden="true"><span class="buddy-eye"></span><span class="buddy-eye"></span></div>
+      <h3>DESK BUDDY</h3>
+      <p>A tiny desk companion with two glowing eyes, blinking continuously.</p>
+      <span class="desk-tag">● ONLINE</span>
+    </article>
+
+    <article class="desk-card">
+      <div class="radar-gauge" aria-label="Animated radar gauge from zero to one hundred">
+        <svg viewBox="0 0 200 115" role="img" aria-hidden="true">
+          <path d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="rgba(220,230,255,.3)" stroke-width="3"/>
+          <path d="M30 100 A70 70 0 0 1 170 100" fill="none" stroke="#f4ed25" stroke-width="2" stroke-dasharray="3 5"/>
+          <path d="M48 100 A52 52 0 0 1 152 100" fill="none" stroke="rgba(244,237,37,.22)" stroke-width="2"/>
+          <g stroke="#aab5cf" stroke-width="2">
+            <line x1="20" y1="100" x2="28" y2="100"/><line x1="100" y1="20" x2="100" y2="29"/><line x1="180" y1="100" x2="172" y2="100"/>
+          </g>
+          <line id="radarNeedle" class="radar-needle" x1="100" y1="100" x2="100" y2="30" stroke="#f4ed25" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="100" cy="100" r="6" fill="#f4ed25"/>
+        </svg>
+        <div class="radar-scale"><span>0</span><span>50</span><span>100</span></div>
+      </div>
+      <div class="radar-readout"><span id="radarValue">0</span> / 100</div>
+      <h3>DESK RADAR</h3>
+      <p>A live 0–100 meter. Its needle sweeps forward and returns endlessly.</p>
+      <span class="desk-tag">● SCANNING</span>
+    </article>
+
+    <article class="desk-card">
+      <div class="spotify-device" aria-hidden="true">
+        <div class="spotify-screen"><i></i><i></i><i></i><i></i></div>
+        <div class="spotify-bars">
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+      <h3>SPOTIFY MINI</h3>
+      <p>A miniature music-style display with a continuously moving equalizer.</p>
+      <span class="desk-tag">● PLAYING</span>
+    </article>
+  </section>
 
   <section class="block" id="bots">
     <div class="sec-head enter" style="--d:1.2s"><span class="line"></span><h2>My Telegram <em>Bots</em></h2></div>
@@ -367,10 +476,44 @@ function startTyping() {
   tick();
 }
 
+// Opening intro stays briefly, then reveals the unchanged website.
+function startIntro() {
+  const intro = document.getElementById("introScreen");
+  if (!intro) return;
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduceMotion) {
+    intro.remove();
+    return;
+  }
+  window.setTimeout(() => {
+    intro.classList.add("hide");
+    window.setTimeout(() => intro.remove(), 950);
+  }, 3900);
+}
+
+// Desk Radar: smoothly sweeps from 0 to 100 and back forever.
+function startRadar() {
+  const needle = document.getElementById("radarNeedle");
+  const valueEl = document.getElementById("radarValue");
+  if (!needle || !valueEl) return;
+  let value = 0;
+  let direction = 1;
+  window.setInterval(() => {
+    value += direction;
+    if (value >= 100) { value = 100; direction = -1; }
+    if (value <= 0) { value = 0; direction = 1; }
+    const angle = -90 + (value * 1.8);
+    needle.style.transform = `rotate(${angle}deg)`;
+    valueEl.textContent = String(value);
+  }, 24);
+}
+
 render();
+startIntro();
+startRadar();
 
 // After the entrance animation ends, hand control back so hover effects work
-document.addEventListener("animationend", e => {
+ document.addEventListener("animationend", e => {
   if (e.animationName === "settle" && e.target.classList && e.target.classList.contains("enter") && !e.target.classList.contains("keep")) e.target.classList.add("done");
 }, true);
 </script>
