@@ -284,50 +284,6 @@
     </div>
   </header>
 
-  <section class="block" id="dash">
-    <div class="sec-head enter" data-delay="0.2"><span class="line"></span><h2>Live <em>Dashboard</em></h2></div>
-    <div class="dash-grid">
-
-      <article class="dcard enter" data-delay="0.5">
-        <div class="dhead"><span class="dot"></span><span>DESK BUDDY</span></div>
-        <div class="dbody">
-          <div class="monitor">
-            <span class="light l1"></span>
-            <span class="light l2"></span>
-          </div>
-          <div class="stand"></div>
-          <div class="base"></div>
-        </div>
-      </article>
-
-      <article class="dcard enter" data-delay="0.6">
-        <div class="dhead"><span class="dot"></span><span>DESK RADAR</span></div>
-        <div class="dbody">
-          <svg class="gauge-svg" viewBox="0 0 200 124" aria-hidden="true">
-            <path class="g-track" d="M20 110 A80 80 0 0 1 180 110"/>
-            <path id="garc" class="g-val" d="M20 110 A80 80 0 0 1 180 110" stroke-dasharray="251.33 251.33" stroke-dashoffset="251.33"/>
-            <g class="g-ticks" id="ticks"></g>
-            <line id="needle" class="g-needle" x1="100" y1="110" x2="100" y2="44" transform="rotate(-90 100 110)"/>
-            <circle class="g-hub" cx="100" cy="110" r="5"/>
-          </svg>
-          <div class="readout"><b id="gv">0</b><span>%</span></div>
-        </div>
-      </article>
-
-      <article class="dcard enter" data-delay="0.7">
-        <div class="dhead"><span class="dot"></span><span>SPOTIFY MINI</span></div>
-        <div class="dbody">
-          <div class="tile">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>
-          </div>
-          <div class="ptitle">NOW PLAYING</div>
-          <div class="eq" id="eq"></div>
-        </div>
-      </article>
-
-    </div>
-  </section>
-
   <section class="block" id="telemetry">
     <div class="sec-head enter" data-delay="0.7"><span class="line"></span><h2>System <em>Telemetry</em></h2></div>
     <div class="dash-grid">
@@ -633,53 +589,6 @@ function startTyping() {
     loader.classList.add("leave");
     setTimeout(() => loader.remove(), 480);
   }, 2000);
-})();
-
-// ----- Dashboard: Desk Radar needle (0 -> 100 -> 0, continuous, never stops) -----
-(function setupRadar() {
-  const needle = document.getElementById("needle");
-  const arc = document.getElementById("garc");
-  const readout = document.getElementById("gv");
-  const ticks = document.getElementById("ticks");
-  if (!needle || !arc || !readout || !ticks) return;
-
-  ticks.innerHTML = Array.from({ length: 11 }, (_, k) =>
-    `<line x1="100" y1="34" x2="100" y2="${k % 5 === 0 ? 42 : 40}" transform="rotate(${-90 + 18 * k} 100 110)"/>`
-  ).join("");
-
-  const ARC_LEN = Math.PI * 80;
-  function paint(v) {
-    needle.setAttribute("transform", `rotate(${(-90 + v * 1.8).toFixed(2)} 100 110)`);
-    arc.style.strokeDashoffset = (ARC_LEN * (1 - v / 100)).toFixed(2);
-    readout.textContent = Math.round(v);
-  }
-  if (REDUCE) { paint(50); return; }
-
-  const PERIOD = 4; // seconds for one full 0 -> 100 -> 0 sweep
-  const start = performance.now();
-  let lastR = 0;
-  const secR = document.getElementById("dash");
-  function frame(now) {
-    requestAnimationFrame(frame);
-    if (now - lastR < 32 || !inView(secR)) return;
-    lastR = now;
-    const t = (now - start) / 1000;
-    const v = Math.max(0, Math.min(100, 50 + 40 * Math.sin(t * 1.3) + 8 * Math.sin(t * 3.7 + 1) + 4 * Math.sin(t * 9.1) + 2 * Math.sin(t * 37)));
-    paint(v);
-  }
-  requestAnimationFrame(frame);
-})();
-
-// ----- Dashboard: Spotify Mini equalizer bars (different speeds) -----
-(function setupEqualizer() {
-  const host = document.getElementById("eq");
-  if (!host) return;
-  const bars = 16;
-  host.innerHTML = Array.from({ length: bars }, (_, i) => {
-    const dur = (0.45 + ((i * 37) % 11) / 10).toFixed(2);   // 0.45s .. 1.45s
-    const delay = (((i * 53) % 7) / 10).toFixed(1);         // 0.0s .. 0.6s
-    return `<i style="--t:${dur}s;--dl:${delay}s"></i>`;
-  }).join("");
 })();
 
 render();
