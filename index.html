@@ -31,11 +31,11 @@
   /* ----- Premium colour-shifting background ----- */
   .bgfx { position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; background:var(--bg); }
   .bgfx::after { content:""; position:absolute; inset:0; background:linear-gradient(rgba(5,10,24,.6), rgba(5,10,24,.88)); }
-  .blob { position:absolute; width:62vmax; height:62vmax; border-radius:50%; filter:blur(110px); opacity:.4; }
-  .b1 { top:-18%; left:-14%; animation:drift1 30s ease-in-out infinite alternate, gold 24s ease-in-out infinite; }
-  .b2 { top:30%; right:-22%; animation:drift2 34s ease-in-out infinite alternate, blueRed 28s ease-in-out infinite; }
-  .b3 { bottom:-24%; left:12%; animation:drift3 26s ease-in-out infinite alternate, greenBlue 32s ease-in-out infinite; }
-  .b4 { top:6%; left:38%; width:48vmax; height:48vmax; animation:drift4 22s ease-in-out infinite alternate, redGold 26s ease-in-out infinite; }
+  .blob { position:absolute; width:62vmax; height:62vmax; border-radius:50%; opacity:.55; will-change:transform; }
+  .b1 { top:-18%; left:-14%; background:radial-gradient(circle,#d9a441,transparent 68%); animation:drift1 30s ease-in-out infinite alternate; }
+  .b2 { top:30%; right:-22%; background:radial-gradient(circle,#2f6fdb,transparent 68%); animation:drift2 34s ease-in-out infinite alternate; }
+  .b3 { bottom:-24%; left:12%; background:radial-gradient(circle,#3ddc97,transparent 68%); animation:drift3 26s ease-in-out infinite alternate; }
+  .b4 { top:6%; left:38%; width:48vmax; height:48vmax; background:radial-gradient(circle,#e04a4a,transparent 68%); animation:drift4 22s ease-in-out infinite alternate; }
   @keyframes drift1 { 0%,100% { transform:translate(0,0); } 50% { transform:translate(18vw,12vh); } }
   @keyframes drift2 { 0%,100% { transform:translate(0,0); } 50% { transform:translate(-20vw,-10vh); } }
   @keyframes drift3 { 0%,100% { transform:translate(0,0); } 50% { transform:translate(16vw,-14vh); } }
@@ -123,9 +123,9 @@
   /* Card 2: Desk Radar (speedometer, needle never stops) */
   .gauge-svg { width:100%; max-width:260px; height:auto; overflow:visible; }
   .g-track { fill:none; stroke:rgba(255,255,255,.18); stroke-width:6; stroke-linecap:round; }
-  .g-val { fill:none; stroke:var(--yellow); stroke-width:6; stroke-linecap:round; filter:drop-shadow(0 0 6px rgba(255,210,31,.7)); }
+  .g-val { fill:none; stroke:var(--yellow); stroke-width:6; stroke-linecap:round; }
   .g-ticks line { stroke:rgba(255,255,255,.7); stroke-width:2; }
-  .g-needle { stroke:var(--yellow); stroke-width:3; stroke-linecap:round; filter:drop-shadow(0 0 4px rgba(255,210,31,.8)); }
+  .g-needle { stroke:var(--yellow); stroke-width:3; stroke-linecap:round; }
   .g-hub { fill:var(--yellow); }
   .readout { display:flex; align-items:baseline; gap:6px; font-family:"Oswald", sans-serif; }
   .readout b { font-size:2.4rem; font-weight:700; color:var(--yellow); font-variant-numeric:tabular-nums; min-width:3ch; text-align:center; }
@@ -136,7 +136,7 @@
   .tile svg { width:30px; height:30px; fill:#000; }
   .ptitle { font-family:"Oswald", sans-serif; letter-spacing:.2em; font-size:.8rem; color:rgba(255,255,255,.75); }
   .eq { display:flex; align-items:flex-end; justify-content:center; gap:5px; height:96px; width:100%; }
-  .eq i { display:block; width:6px; height:100%; border-radius:3px; background:var(--yellow); box-shadow:0 0 10px rgba(255,210,31,.5); transform-origin:bottom; animation:eq var(--t) ease-in-out var(--dl) infinite alternate; }
+  .eq i { display:block; width:6px; height:100%; border-radius:3px; background:var(--yellow); transform-origin:bottom; animation:eq var(--t) ease-in-out var(--dl) infinite alternate; }
   @keyframes eq { 0% { transform:scaleY(.12); } 100% { transform:scaleY(1); } }
 
   /* ----- Bots ----- */
@@ -171,6 +171,7 @@
   .chan small { color:var(--muted); }
   .chan .join { margin-left:auto; background:var(--accent); color:#fff; padding:8px 14px; border-radius:999px; font-size:.85rem; font-weight:700; white-space:nowrap; }
 
+  .off :not(.enter) { animation-play-state:paused !important; }
   .about { color:var(--muted); max-width:720px; }
   footer { margin-top:60px; padding:26px 0 36px; border-top:1px solid var(--line); display:flex; justify-content:space-between; flex-wrap:wrap; gap:14px; color:var(--muted); font-size:.92rem; }
   footer b { color:var(--text); }
@@ -195,14 +196,14 @@
   .r-ring { fill:none; stroke:rgba(255,255,255,.2); stroke-width:1.5; }
   .r-cross { stroke:rgba(255,255,255,.14); stroke-width:1; }
   .r-wedge { fill:rgba(255,210,31,.2); }
-  .r-edge { stroke:var(--yellow); stroke-width:2; filter:drop-shadow(0 0 5px rgba(255,210,31,.9)); }
+  .r-edge { stroke:var(--yellow); stroke-width:2; }
   .sweep { transform-origin:100px 100px; animation:spin 3s linear infinite; }
-  .blip { fill:var(--yellow); animation:blinkY 1.8s ease-in-out infinite; filter:drop-shadow(0 0 5px var(--yellow)); }
+  .blip { fill:var(--yellow); animation:blinkY 1.8s ease-in-out infinite; }
   #waveCv { width:100%; height:110px; display:block; }
   .stats { width:100%; display:grid; gap:12px; }
   .st { display:grid; grid-template-columns:48px 1fr 46px; align-items:center; gap:10px; font-family:"Oswald",sans-serif; font-size:.78rem; letter-spacing:.14em; color:rgba(255,255,255,.8); }
   .st .tr { height:8px; border-radius:6px; background:rgba(255,255,255,.12); overflow:hidden; }
-  .st .fl { display:block; height:100%; width:10%; border-radius:6px; background:linear-gradient(90deg,#b88a00,var(--yellow)); box-shadow:0 0 10px rgba(255,210,31,.6); }
+  .st .fl { display:block; height:100%; width:100%; border-radius:6px; background:linear-gradient(90deg,#b88a00,var(--yellow)); transform-origin:left; transform:scaleX(.1); will-change:transform; }
   .st em { font-style:normal; text-align:right; color:var(--yellow); font-variant-numeric:tabular-nums; }
   /* ----- Terminal frame ----- */
   .term { background:#02060f; border:1px solid var(--line); border-radius:16px; overflow:hidden; box-shadow:0 20px 60px -20px rgba(47,139,255,.35); }
@@ -656,11 +657,15 @@ function startTyping() {
 
   const PERIOD = 4; // seconds for one full 0 -> 100 -> 0 sweep
   const start = performance.now();
+  let lastR = 0;
+  const secR = document.getElementById("dash");
   function frame(now) {
+    requestAnimationFrame(frame);
+    if (now - lastR < 32 || !inView(secR)) return;
+    lastR = now;
     const t = (now - start) / 1000;
     const v = Math.max(0, Math.min(100, 50 + 40 * Math.sin(t * 1.3) + 8 * Math.sin(t * 3.7 + 1) + 4 * Math.sin(t * 9.1) + 2 * Math.sin(t * 37)));
     paint(v);
-    requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
 })();
@@ -683,73 +688,105 @@ render();
 document.addEventListener("animationend", e => {
   if (e.animationName === "settle" && e.target.classList && e.target.classList.contains("enter") && !e.target.classList.contains("keep")) e.target.classList.add("done");
 }, true);
+
+// ----- Performance: pause animations and videos that are off screen -----
+const VIS = new WeakMap();
+function inView(el) { return !el || VIS.get(el) !== false; }
+if ("IntersectionObserver" in window) {
+  const io = new IntersectionObserver(entries => entries.forEach(e => {
+    VIS.set(e.target, e.isIntersecting);
+    e.target.classList.toggle("off", !e.isIntersecting);
+    e.target.querySelectorAll("video.bot-media").forEach(v => {
+      if (e.isIntersecting) { const p = v.play(); if (p && p.catch) p.catch(() => {}); } else v.pause();
+    });
+  }), { rootMargin: "100px" });
+  document.querySelectorAll("header.hero, section.block, section.two, footer").forEach(el => io.observe(el));
+}
 </script>
 <script>
-// ----- Telemetry: speed meter (0 -> 100 non-stop), wave, load bars -----
+// ----- Telemetry: speed meter (0 -> 100 non-stop), wave, load bars (run only while on screen) -----
 (function setupTelemetry() {
+  const sec = document.getElementById("telemetry");
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  // Speed meter
   const needle = document.getElementById("sgNeedle"), arc = document.getElementById("sgArc");
   const val = document.getElementById("sgVal"), ticks = document.getElementById("sgTicks");
   if (needle && arc && val && ticks) {
     ticks.innerHTML = Array.from({ length: 11 }, (_, k) =>
       `<line x1="100" y1="34" x2="100" y2="${k % 5 === 0 ? 42 : 40}" transform="rotate(${-90 + 18 * k} 100 110)"/>`).join("");
-    const LEN = Math.PI * 80;
+    const LEN = Math.PI * 80, P = 3.4, t0 = performance.now();
+    let shown = -1, last = 0;
     const paint = v => {
-      needle.setAttribute("transform", `rotate(${(-90 + v * 1.8).toFixed(2)} 100 110)`);
-      arc.style.strokeDashoffset = (LEN * (1 - v / 100)).toFixed(2);
-      val.textContent = Math.round(v);
+      needle.setAttribute("transform", `rotate(${(-90 + v * 1.8).toFixed(1)} 100 110)`);
+      arc.style.strokeDashoffset = (LEN * (1 - v / 100)).toFixed(1);
+      const r = Math.round(v);
+      if (r !== shown) { shown = r; val.textContent = r; }
     };
-    if (REDUCE) paint(60);
-    else {
-      const t0 = performance.now(), P = 3.4;
-      (function f(now) {
-        const p = (((now - t0) / 1000) % P) / P;
-        const tt = (now - t0) / 1000, j = 3 * Math.sin(tt * 13) + 2 * Math.sin(tt * 29) + 2 * Math.sin(tt * 47);
-        paint(Math.max(0, Math.min(100, (p < 0.82 ? 100 * (p / 0.82) : 100 * (1 - (p - 0.82) / 0.18)) + j)));
-        requestAnimationFrame(f);
-      })(t0);
-    }
+    (function f(now) {
+      requestAnimationFrame(f);
+      if (now - last < 32 || !inView(sec)) return;
+      last = now;
+      const tt = (now - t0) / 1000, p = (tt % P) / P;
+      const j = 3 * Math.sin(tt * 13) + 2 * Math.sin(tt * 29) + 2 * Math.sin(tt * 47);
+      paint(clamp((p < 0.82 ? 100 * (p / 0.82) : 100 * (1 - (p - 0.82) / 0.18)) + j, 0, 100));
+    })(performance.now());
   }
 
+  // Signal wave
   const cv = document.getElementById("waveCv");
-  if (cv && !REDUCE) {
+  if (cv) {
     const c = cv.getContext("2d");
+    let w = 0, h = 0, d = 1, last = 0;
+    const fit = () => {
+      d = Math.min(window.devicePixelRatio || 1, 2);
+      w = cv.clientWidth; h = cv.clientHeight;
+      cv.width = w * d; cv.height = h * d;
+    };
+    fit();
+    window.addEventListener("resize", fit);
     (function f(now) {
-      const d = Math.min(window.devicePixelRatio || 1, 2), w = cv.clientWidth, h = cv.clientHeight;
-      if (cv.width !== w * d) { cv.width = w * d; cv.height = h * d; }
+      requestAnimationFrame(f);
+      if (now - last < 33 || !inView(sec)) return;
+      last = now;
+      if (!w) fit();
       c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, w, h);
       const t = now / 1000;
-      [[1, "rgba(255,210,31,.95)", 6], [0.55, "rgba(255,210,31,.35)", 0]].forEach(([amp, col, sh], n) => {
+      [[1, "rgba(255,210,31,.95)", 4], [0.55, "rgba(255,210,31,.35)", 0]].forEach(([amp, col, sh], n) => {
         c.beginPath(); c.lineWidth = 2; c.strokeStyle = col; c.shadowColor = "#ffd21f"; c.shadowBlur = sh;
-        for (let x = 0; x <= w; x += 3) {
+        for (let x = 0; x <= w; x += 4) {
           const u = x / w * 9 + t * (n ? 2.2 : 3.4);
           const y = h / 2 + amp * (Math.sin(u) * h * 0.28 + Math.sin(u * 2.7 + t) * h * 0.1 + Math.sin(u * 7.3) * h * 0.05 * Math.sin(t * 2));
           x ? c.lineTo(x, y) : c.moveTo(x, y);
         }
         c.stroke();
       });
-      requestAnimationFrame(f);
     })(performance.now());
   }
 
-  const rows = document.querySelectorAll("#stats .st");
+  // System load bars (transform only, no layout work)
+  const rows = Array.from(document.querySelectorAll("#stats .st")).map(r => ({ fl: r.querySelector(".fl"), em: r.querySelector("em"), shown: -1 }));
   const ph = [0, 1.7, 3.1, 4.6], sp = [1.1, 0.8, 1.5, 1.9];
-  function bump(now) {
+  let lastB = 0;
+  (function f(now) {
+    requestAnimationFrame(f);
+    if (now - lastB < 40 || !inView(sec)) return;
+    lastB = now;
     const t = now / 1000;
     rows.forEach((r, i) => {
-      const v = Math.max(3, Math.min(99, 50 + 38 * Math.sin(t * sp[i] + ph[i]) + 8 * Math.sin(t * 4.3 + i) + 3 * Math.sin(t * 11 + i * 2)));
-      r.querySelector(".fl").style.width = v.toFixed(1) + "%";
-      r.querySelector("em").textContent = Math.round(v) + "%";
+      const v = clamp(50 + 38 * Math.sin(t * sp[i] + ph[i]) + 8 * Math.sin(t * 4.3 + i) + 3 * Math.sin(t * 11 + i * 2), 3, 99);
+      r.fl.style.transform = `scaleX(${(v / 100).toFixed(3)})`;
+      const k = Math.round(v);
+      if (k !== r.shown) { r.shown = k; r.em.textContent = k + "%"; }
     });
-    if (!REDUCE) requestAnimationFrame(bump);
-  }
-  requestAnimationFrame(bump);
+  })(performance.now());
 })();
 
 // ----- Terminal: real-looking bot coding session + live logs, non-stop -----
 (function setupTerminal() {
   const body = document.getElementById("termBody");
   if (!body) return;
-  const MAX = 60, sleep = ms => new Promise(r => setTimeout(r, ms));
+  const MAX = 18, sleep = ms => new Promise(r => setTimeout(r, ms));
   const n = (a, b) => Math.round(rand(a, b));
   const pick = a => a[Math.floor(Math.random() * a.length)];
   const cur = document.createElement("div");
