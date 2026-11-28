@@ -5,32 +5,41 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bots by Ankit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-  @property --angle { syntax:"<angle>"; inherits:false; initial-value:0deg; }
-
   :root {
     --bg:#050a18; --card:#0c1430; --line:rgba(120,160,255,.16); --text:#f3f6ff; --muted:#9aa8c7;
     --accent:#2f8bff; --accent2:#5ec2ff; --gold:#e7b75a;
+    --yellow:#ffd21f;
   }
   * { box-sizing:border-box; }
   html { scroll-behavior:smooth; }
   body { margin:0; background:var(--bg); color:var(--text); font-family:"Inter", system-ui, -apple-system, sans-serif; line-height:1.5; overflow-x:hidden; }
   a { color:inherit; }
 
+  /* ----- Opening loader (shows on every page open, ~2s) ----- */
+  .loader { position:fixed; inset:0; z-index:1000; background:radial-gradient(circle at 50% 45%, #0a1a3a 0%, #03070f 70%); display:grid; place-items:center; overflow:hidden; transition:opacity .45s ease; }
+  .loader.leave { opacity:0; pointer-events:none; }
+  #net { position:absolute; inset:0; width:100%; height:100%; }
+  .ld { position:relative; width:min(300px,70vw); aspect-ratio:1; display:grid; place-items:center; }
+  .ring { position:absolute; inset:0; animation:spin 2.4s linear infinite; }
+  .ring i { position:absolute; width:8px; height:8px; margin:-4px 0 0 -4px; border-radius:50%; background:#58d8ff; box-shadow:0 0 10px #58d8ff; animation:dot 1.2s linear var(--dl) infinite; }
+  @keyframes dot { 0%,100% { opacity:.15; transform:scale(.7); } 25% { opacity:1; transform:scale(1.25); } }
+  .ld-text { position:relative; font-family:"Inter", sans-serif; font-weight:600; font-size:clamp(16px,2.6vw,22px); letter-spacing:.24em; color:#d6f2ff; text-shadow:0 0 12px #3cc8ff, 0 0 30px #1f8fff; animation:ldPulse 1.2s ease-in-out infinite; }
+  @keyframes ldPulse { 0%,100% { opacity:.75; } 50% { opacity:1; } }
+
   /* ----- Premium colour-shifting background ----- */
   .bgfx { position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; background:var(--bg); }
   .bgfx::after { content:""; position:absolute; inset:0; background:linear-gradient(rgba(5,10,24,.6), rgba(5,10,24,.88)); }
-  .blob { position:absolute; width:62vmax; height:62vmax; border-radius:50%; filter:blur(110px); opacity:.4; animation:drift 28s ease-in-out infinite alternate, hue 24s ease-in-out infinite; }
-  .b1 { top:-18%; left:-14%; animation-duration:30s, 24s; animation-name:drift1, gold; }
-  .b2 { top:30%; right:-22%; animation-duration:34s, 28s; animation-name:drift2, blueRed; }
-  .b3 { bottom:-24%; left:12%; animation-duration:26s, 32s; animation-name:drift3, greenBlue; }
-  .b4 { top:6%; left:38%; width:48vmax; height:48vmax; animation-duration:22s, 26s; animation-name:drift4, redGold; }
+  .blob { position:absolute; width:62vmax; height:62vmax; border-radius:50%; filter:blur(110px); opacity:.4; }
+  .b1 { top:-18%; left:-14%; animation:drift1 30s ease-in-out infinite alternate, gold 24s ease-in-out infinite; }
+  .b2 { top:30%; right:-22%; animation:drift2 34s ease-in-out infinite alternate, blueRed 28s ease-in-out infinite; }
+  .b3 { bottom:-24%; left:12%; animation:drift3 26s ease-in-out infinite alternate, greenBlue 32s ease-in-out infinite; }
+  .b4 { top:6%; left:38%; width:48vmax; height:48vmax; animation:drift4 22s ease-in-out infinite alternate, redGold 26s ease-in-out infinite; }
   @keyframes drift1 { 0%,100% { transform:translate(0,0); } 50% { transform:translate(18vw,12vh); } }
   @keyframes drift2 { 0%,100% { transform:translate(0,0); } 50% { transform:translate(-20vw,-10vh); } }
   @keyframes drift3 { 0%,100% { transform:translate(0,0); } 50% { transform:translate(16vw,-14vh); } }
   @keyframes drift4 { 0%,100% { transform:translate(0,0); } 50% { transform:translate(-14vw,16vh); } }
-  @keyframes hue { }
   @keyframes gold { 0% { background-color:#d9a441; } 33% { background-color:#f1d27a; } 66% { background-color:#8fd9b0; } 100% { background-color:#d9a441; } }
   @keyframes blueRed { 0% { background-color:#2f6fdb; } 50% { background-color:#b8232f; } 100% { background-color:#2f6fdb; } }
   @keyframes greenBlue { 0% { background-color:#3ddc97; } 50% { background-color:#1e3a8a; } 100% { background-color:#3ddc97; } }
@@ -38,27 +47,13 @@
 
   .wrap { position:relative; z-index:1; max-width:1200px; margin:0 auto; padding:0 24px; }
 
-  /* ----- Falling-in entrance: items start scattered and settle into place ----- */
-  .enter { animation:settle .85s cubic-bezier(.2,.8,.2,1) both; animation-delay:var(--d, 2s); }
+  /* ----- Falling-in entrance: items start scattered and settle into place (all done by ~4.8s) ----- */
+  .enter { animation:settle .9s cubic-bezier(.2,.8,.2,1) both; animation-delay:var(--d, 2.5s); }
   @keyframes settle {
     from { opacity:1; transform:translate(var(--x,0px), var(--y,260px)) rotate(var(--r,0deg)); }
     to   { opacity:1; transform:none; }
   }
   .enter.done { animation:none; opacity:1; transform:none; }
-
-  /* ----- Opening intro ----- */
-  .intro-screen { position:fixed; inset:0; z-index:100000; display:grid; place-items:center; padding:24px; background:#020307; opacity:1; visibility:visible; transition:opacity .85s ease, visibility .85s ease; }
-  .intro-screen.hide { opacity:0; visibility:hidden; pointer-events:none; }
-  .intro-content { width:min(760px,100%); display:grid; gap:12px; }
-  .intro-box { min-height:76px; display:flex; align-items:center; overflow:hidden; padding:10px 18px; border:1px solid rgba(238,244,255,.78); background:rgba(255,255,255,.015); box-shadow:0 0 22px rgba(255,255,255,.035), inset 0 0 18px rgba(255,255,255,.025); clip-path:inset(0 100% 0 0); animation:introBoxDraw .8s cubic-bezier(.6,0,.3,1) forwards; }
-  .intro-box:nth-child(2) { animation-delay:.38s; }
-  .intro-box:nth-child(3) { animation-delay:.76s; }
-  .intro-word { display:block; width:100%; color:#f5f7ff; font-family:Impact,"Arial Narrow",sans-serif; font-size:clamp(2rem,8vw,5rem); font-weight:900; letter-spacing:.045em; line-height:1.05; text-transform:uppercase; transform:translateY(115%); animation:introWordReveal .75s cubic-bezier(.16,1,.3,1) forwards; animation-delay:.48s; }
-  .intro-box:nth-child(2) .intro-word { animation-delay:.86s; }
-  .intro-box:nth-child(3) .intro-word { animation-delay:1.24s; }
-  .intro-word.outline { color:transparent; -webkit-text-stroke:1.5px #f5f7ff; }
-  @keyframes introBoxDraw { to { clip-path:inset(0 0 0 0); } }
-  @keyframes introWordReveal { to { transform:translateY(0); } }
 
   /* ----- Nav ----- */
   nav.top { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:18px 0; border-bottom:1px solid var(--line); }
@@ -91,72 +86,70 @@
 
   .hero-art { position:relative; display:grid; place-items:center; min-height:460px; }
   .orbit { position:absolute; width:min(460px,90vw); aspect-ratio:1; border-radius:50%; border:2px dashed rgba(94,194,255,.35); }
-  .orbit.enter { animation:settle .85s cubic-bezier(.2,.8,.2,1) var(--d) both, spin 26s linear 3.2s infinite; }
+  .orbit.enter { animation:settle .9s cubic-bezier(.2,.8,.2,1) var(--d) both, spin 26s linear 3.5s infinite; }
   .orbit::after { content:""; position:absolute; width:14px; height:14px; border-radius:50%; background:var(--accent2); top:-7px; left:50%; box-shadow:0 0 18px var(--accent2); }
   .plane { position:absolute; width:min(300px,62vw); top:-20px; right:-10px; }
   .plane svg { width:100%; height:auto; fill:var(--accent); filter:drop-shadow(0 20px 40px rgba(47,139,255,.45)); }
   .avatar-ring { position:absolute; width:min(250px,60vw); aspect-ratio:1; border-radius:50%; padding:6px; background:conic-gradient(var(--accent2),var(--accent),#7a5cff,var(--accent2)); box-shadow:0 0 60px rgba(47,139,255,.45); }
-  .avatar-ring.enter { animation:settle .85s cubic-bezier(.2,.8,.2,1) var(--d) both; }
+  .avatar-ring.enter { animation:settle .9s cubic-bezier(.2,.8,.2,1) var(--d) both; }
   .avatar-inner { position:absolute; inset:6px; border-radius:50%; background:var(--card); overflow:hidden; display:grid; place-items:center; font-size:4.5rem; font-weight:800; color:var(--accent2); }
   .avatar-inner img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
   .handle { position:absolute; bottom:-8px; background:rgba(12,20,48,.9); border:1px solid var(--line); padding:8px 16px; border-radius:999px; font-size:.92rem; color:var(--text); }
   @keyframes spin { to { transform:rotate(360deg); } }
-  @keyframes spin-back { to { transform:rotate(-360deg); } }
-
-  /* ----- Three continuously animated desk widgets ----- */
-  .desk-widgets { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; padding:22px 0 12px; }
-  .desk-card { position:relative; min-width:0; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:13px; min-height:225px; padding:22px 18px; text-align:center; text-decoration:none; color:var(--text); background:linear-gradient(155deg,rgba(7,12,27,.96),rgba(12,20,48,.96)); border:1px solid rgba(160,185,235,.22); border-radius:15px; box-shadow:0 12px 30px rgba(0,0,0,.18); transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease; }
-  .desk-card:hover { transform:translateY(-5px); border-color:rgba(244,237,37,.65); box-shadow:0 14px 36px rgba(244,237,37,.08); }
-  .desk-card h3 { margin:0; font-size:1rem; letter-spacing:.12em; font-weight:800; }
-  .desk-card p { max-width:290px; margin:0; color:var(--muted); font-size:.78rem; line-height:1.55; }
-  .desk-tag { color:#f4ed25; font-size:.65rem; font-weight:800; letter-spacing:.13em; }
-  .widget-yellow { color:#f4ed25; }
-
-  /* Desk Buddy: two glowing animated eyes */
-  .buddy-face { position:relative; width:112px; height:78px; display:flex; align-items:center; justify-content:center; gap:15px; border:2px solid rgba(238,244,255,.75); border-radius:14px; background:#05070d; box-shadow:0 0 18px rgba(255,255,255,.06),inset 0 0 18px rgba(255,255,255,.035); }
-  .buddy-face::before { content:""; position:absolute; width:35px; height:12px; left:50%; bottom:-14px; transform:translateX(-50%); border:2px solid rgba(238,244,255,.55); border-top:0; border-radius:0 0 5px 5px; }
-  .buddy-eye { width:17px; height:27px; border-radius:5px; background:#f4ed25; box-shadow:0 0 13px rgba(244,237,37,.9),0 0 25px rgba(244,237,37,.35); animation:buddyBlink 3.2s infinite; }
-  .buddy-eye:nth-child(2) { animation-delay:.12s; }
-  @keyframes buddyBlink { 0%,43%,47%,100% { transform:scaleY(1); opacity:1; } 45% { transform:scaleY(.12); opacity:.65; } }
-
-  /* Desk Radar: needle sweeps across a 0-100 scale */
-  .radar-gauge { width:180px; height:102px; position:relative; overflow:hidden; }
-  .radar-gauge svg { display:block; width:180px; height:110px; overflow:visible; }
-  .radar-needle { transform-origin:100px 100px; transform:rotate(-90deg); transition:transform .04s linear; }
-  .radar-readout { margin-top:-1px; color:#f4ed25; font-size:1.05rem; font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:.05em; }
-  .radar-scale { position:absolute; left:8px; right:8px; bottom:0; display:flex; justify-content:space-between; color:#9aa8c7; font-size:.58rem; }
-
-  /* Spotify Mini: miniature screen with an always-moving equalizer */
-  .spotify-device { width:92px; height:86px; padding:9px; display:flex; flex-direction:column; justify-content:space-between; border:2px solid rgba(238,244,255,.72); border-radius:9px; background:#05070d; box-shadow:0 0 18px rgba(255,255,255,.05); }
-  .spotify-screen { height:25px; border:1px solid rgba(244,237,37,.65); background:rgba(244,237,37,.1); display:flex; align-items:center; justify-content:center; gap:5px; }
-  .spotify-screen i { width:4px; height:10px; border-radius:2px; background:#f4ed25; box-shadow:0 0 8px rgba(244,237,37,.5); animation:miniPulse .7s ease-in-out infinite alternate; }
-  .spotify-screen i:nth-child(2) { height:16px; animation-delay:.18s; }
-  .spotify-screen i:nth-child(3) { height:7px; animation-delay:.32s; }
-  .spotify-screen i:nth-child(4) { height:13px; animation-delay:.48s; }
-  .spotify-bars { height:24px; display:flex; align-items:center; justify-content:center; gap:4px; }
-  .spotify-bars span { display:block; width:5px; height:7px; border-radius:2px; background:#f4ed25; box-shadow:0 0 8px rgba(244,237,37,.5); animation:spotifyEqualize .65s ease-in-out infinite alternate; }
-  .spotify-bars span:nth-child(2n) { animation-delay:.16s; }
-  .spotify-bars span:nth-child(3n) { animation-delay:.31s; }
-  .spotify-bars span:nth-child(4n) { animation-delay:.45s; }
-  @keyframes miniPulse { from { opacity:.35; } to { opacity:1; } }
-  @keyframes spotifyEqualize { from { height:5px; } to { height:23px; } }
 
   /* ----- Sections ----- */
   .block { padding:60px 0 10px; }
   .sec-head { display:flex; align-items:center; gap:14px; margin-bottom:26px; }
   .sec-head .line { width:44px; height:3px; background:var(--accent); border-radius:3px; }
   .sec-head h2 { margin:0; font-size:clamp(1.7rem,3.4vw,2.2rem); font-weight:800; }
+
+  /* ----- Dashboard cards ----- */
+  .dash-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:18px; }
+  .dcard { position:relative; background:#000; border:1px solid rgba(255,255,255,.12); border-radius:20px; padding:20px 20px 22px; color:#fff; display:flex; flex-direction:column; gap:14px; overflow:hidden; transition:transform .3s, border-color .3s, box-shadow .3s; }
+  .dcard::after { content:""; position:absolute; inset:0; background:radial-gradient(circle at 50% 0%, rgba(255,210,31,.1), transparent 60%); pointer-events:none; }
+  .dcard:hover { transform:translateY(-6px); border-color:rgba(255,210,31,.55); box-shadow:0 18px 44px -18px rgba(255,210,31,.45); }
+  .dhead { display:flex; align-items:center; gap:10px; font-family:"Oswald", sans-serif; font-weight:600; letter-spacing:.18em; font-size:.82rem; color:#fff; }
+  .dhead .dot { width:8px; height:8px; border-radius:50%; background:var(--yellow); box-shadow:0 0 10px var(--yellow); }
+  .dbody { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; }
+
+  /* Card 1: Desk Buddy (monitor with two blinking lights) */
+  .monitor { width:72%; aspect-ratio:16/10; border:2px solid #fff; border-radius:14px; display:flex; align-items:center; justify-content:center; gap:clamp(12px,3vw,26px); box-shadow:inset 0 0 0 1px rgba(255,255,255,.06); }
+  .light { width:16px; height:56%; border-radius:999px; background:var(--yellow); box-shadow:0 0 14px rgba(255,210,31,.8), 0 0 40px rgba(255,210,31,.35); animation:blinkY 1.6s ease-in-out infinite; }
+  .light.l2 { animation-delay:.8s; }
+  @keyframes blinkY { 0%,100% { opacity:.2; } 50% { opacity:1; } }
+  .stand { width:14%; height:16px; border:2px solid #fff; border-top:none; }
+  .base { width:38%; border-top:2px solid #fff; }
+
+  /* Card 2: Desk Radar (speedometer, needle never stops) */
+  .gauge-svg { width:100%; max-width:260px; height:auto; overflow:visible; }
+  .g-track { fill:none; stroke:rgba(255,255,255,.18); stroke-width:6; stroke-linecap:round; }
+  .g-val { fill:none; stroke:var(--yellow); stroke-width:6; stroke-linecap:round; filter:drop-shadow(0 0 6px rgba(255,210,31,.7)); }
+  .g-ticks line { stroke:rgba(255,255,255,.7); stroke-width:2; }
+  .g-needle { stroke:var(--yellow); stroke-width:3; stroke-linecap:round; filter:drop-shadow(0 0 4px rgba(255,210,31,.8)); }
+  .g-hub { fill:var(--yellow); }
+  .readout { display:flex; align-items:baseline; gap:6px; font-family:"Oswald", sans-serif; }
+  .readout b { font-size:2.4rem; font-weight:700; color:var(--yellow); font-variant-numeric:tabular-nums; min-width:3ch; text-align:center; }
+  .readout span { color:rgba(255,255,255,.7); letter-spacing:.2em; font-size:.8rem; }
+
+  /* Card 3: Spotify Mini (music player with equalizer) */
+  .tile { width:64px; height:64px; border-radius:16px; background:var(--yellow); display:grid; place-items:center; box-shadow:0 0 30px rgba(255,210,31,.5); }
+  .tile svg { width:30px; height:30px; fill:#000; }
+  .ptitle { font-family:"Oswald", sans-serif; letter-spacing:.2em; font-size:.8rem; color:rgba(255,255,255,.75); }
+  .eq { display:flex; align-items:flex-end; justify-content:center; gap:5px; height:96px; width:100%; }
+  .eq i { display:block; width:6px; height:100%; border-radius:3px; background:var(--yellow); box-shadow:0 0 10px rgba(255,210,31,.5); transform-origin:bottom; animation:eq var(--t) ease-in-out var(--dl) infinite alternate; }
+  @keyframes eq { 0% { transform:scaleY(.12); } 100% { transform:scaleY(1); } }
+
+  /* ----- Bots ----- */
   .bot-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:20px; }
-  .bot { position:relative; text-decoration:none; background:var(--card); border:1px solid var(--line); border-radius:22px; padding:0 0 22px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:8px; transition:transform .25s, border-color .25s, box-shadow .25s; overflow:hidden; }
+  .bot { position:relative; text-decoration:none; background:var(--card); border:1px solid var(--line); border-radius:22px; padding:26px 22px 22px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:6px; transition:transform .25s, border-color .25s, box-shadow .25s; overflow:hidden; }
   .bot::before { content:""; position:absolute; inset:0 0 auto 0; height:3px; background:var(--c); }
   .bot:hover { transform:translateY(-6px); border-color:var(--c); box-shadow:0 18px 40px -16px var(--c); }
   .live-badge { position:absolute; top:14px; right:14px; font-size:.7rem; font-weight:700; color:#2ee59d; background:rgba(46,229,157,.12); border:1px solid rgba(46,229,157,.35); padding:3px 9px; border-radius:999px; }
-  .bot-media { width:100%; aspect-ratio:16/10; object-fit:cover; display:block; background:#050a18; border-radius:22px 22px 0 0; }
-  .bot-av { width:96px; height:96px; border-radius:50%; padding:4px; background:var(--c); box-shadow:0 0 28px -4px var(--c); margin-top:-48px; position:relative; z-index:2; border:4px solid var(--card); }
-  .bot > h3, .bot > .uname, .bot > .bio, .bot > .open { padding:0 22px; }
+  .bot-av { width:96px; height:96px; border-radius:50%; padding:4px; background:var(--c); box-shadow:0 0 28px -4px var(--c); position:relative; border:4px solid var(--card); }
   .bot-av img, .av-fb { width:100%; height:100%; border-radius:50%; object-fit:cover; background:#1a2550; display:grid; place-items:center; font-size:2rem; font-weight:800; color:var(--c); }
   .bot h3 { margin:10px 0 0; font-size:1.05rem; font-weight:700; word-break:break-word; }
   .uname { color:var(--c); font-size:.9rem; font-weight:600; }
+  .bot-media { width:100%; aspect-ratio:16/10; object-fit:cover; display:block; background:#050a18; border-radius:14px; border:1px solid var(--line); margin:10px 0 4px; }
   .bio { color:var(--muted); font-size:.88rem; margin:2px 0 6px; }
   .open { margin-top:auto; color:var(--c); font-weight:700; font-size:.9rem; }
 
@@ -192,35 +185,61 @@
     .two { grid-template-columns:1fr; }
     .hero-art { min-height:380px; }
   }
-  @media (max-width:680px) {
-    .desk-widgets { grid-template-columns:1fr; gap:14px; }
-    .desk-card { min-height:205px; }
-    .intro-box { min-height:66px; padding:9px 13px; }
+  @media (max-width:560px) {
+    .dash-grid { grid-template-columns:1fr; }
+    .monitor { width:86%; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation:none !important; transition:none !important; }
     .enter { opacity:1; transform:none; }
-    .intro-screen { display:none !important; }
-    .radar-needle { transform:rotate(0deg); }
+    .loader { display:none; }
   }
+
+  /* ----- Telemetry (non-stop meters) ----- */
+  .radar-svg { width:100%; max-width:210px; height:auto; }
+  .r-ring { fill:none; stroke:rgba(255,255,255,.2); stroke-width:1.5; }
+  .r-cross { stroke:rgba(255,255,255,.14); stroke-width:1; }
+  .r-wedge { fill:rgba(255,210,31,.2); }
+  .r-edge { stroke:var(--yellow); stroke-width:2; filter:drop-shadow(0 0 5px rgba(255,210,31,.9)); }
+  .sweep { transform-origin:100px 100px; animation:spin 3s linear infinite; }
+  .blip { fill:var(--yellow); animation:blinkY 1.8s ease-in-out infinite; filter:drop-shadow(0 0 5px var(--yellow)); }
+  #waveCv { width:100%; height:110px; display:block; }
+  .stats { width:100%; display:grid; gap:12px; }
+  .st { display:grid; grid-template-columns:48px 1fr 46px; align-items:center; gap:10px; font-family:"Oswald",sans-serif; font-size:.78rem; letter-spacing:.14em; color:rgba(255,255,255,.8); }
+  .st .tr { height:8px; border-radius:6px; background:rgba(255,255,255,.12); overflow:hidden; }
+  .st .fl { display:block; height:100%; width:10%; border-radius:6px; background:linear-gradient(90deg,#b88a00,var(--yellow)); box-shadow:0 0 10px rgba(255,210,31,.6); transition:width .9s ease; }
+  .st em { font-style:normal; text-align:right; color:var(--yellow); font-variant-numeric:tabular-nums; }
+  /* ----- Terminal frame ----- */
+  .term { background:#02060f; border:1px solid var(--line); border-radius:16px; overflow:hidden; box-shadow:0 20px 60px -20px rgba(47,139,255,.35); }
+  .term-bar { display:flex; align-items:center; gap:7px; padding:10px 14px; background:#0a1226; border-bottom:1px solid var(--line); font:600 .78rem ui-monospace,Menlo,Consolas,monospace; color:var(--muted); }
+  .term-bar i { width:11px; height:11px; border-radius:50%; background:#ff5f57; }
+  .term-bar i:nth-child(2) { background:#febc2e; } .term-bar i:nth-child(3) { background:#28c840; }
+  .term-bar span { margin-left:10px; }
+  .term-body { height:300px; padding:14px 16px; display:flex; flex-direction:column; justify-content:flex-end; overflow:hidden; font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; color:#cfe3ff; white-space:pre-wrap; word-break:break-all; }
+  .t-cmd { color:#2ee59d; }
+  .t-info::before { content:"[INFO] "; color:#5ec2ff; }
+  .t-ok::before { content:"[ OK ] "; color:#2ee59d; }
+  .t-warn::before { content:"[WARN] "; color:#ffd21f; }
+  .t-cur { color:#2ee59d; }
 </style>
 </head>
 <body>
+
+<!-- Opening loader: shows on every page open, finishes in about 2 seconds -->
+<div class="loader" id="loader" aria-hidden="true">
+  <canvas id="net"></canvas>
+  <div class="ld">
+    <div class="ring" id="ring"></div>
+    <div class="ld-text">LOADING</div>
+  </div>
+</div>
+
 <div class="bgfx" aria-hidden="true">
   <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span><span class="blob b4"></span>
 </div>
 
-<!-- Opening animation: blank dark screen, boxes draw, then words reveal -->
-<div class="intro-screen" id="introScreen" aria-label="Welcome to Bots by Ankit">
-  <div class="intro-content">
-    <div class="intro-box"><span class="intro-word outline">WELCOME</span></div>
-    <div class="intro-box"><span class="intro-word">BOTS BY ANKIT</span></div>
-    <div class="intro-box"><span class="intro-word outline">AUTOMATION</span></div>
-  </div>
-</div>
-
 <div class="wrap">
-  <nav class="top enter" style="--d:.6s">
+  <nav class="top enter" data-delay="0">
     <a class="brand" href="#top">
       <span class="logo"><svg viewBox="0 0 24 24"><path d="M9.8 15.2 9.6 19c.4 0 .6-.2.8-.4l2-1.9 4.1 3c.8.4 1.3.2 1.5-.7l2.7-12.7c.3-1.2-.4-1.7-1.2-1.4L2.4 10.1c-1.2.5-1.2 1.1-.2 1.4l4.2 1.3 9.7-6.1c.5-.3.9-.1.5.2z"/></svg></span>
       <span><b>BOTS BY <em>ANKIT</em></b><small>Telegram Bot Creator</small></span>
@@ -236,83 +255,131 @@
 
   <header class="hero" id="top">
     <div>
-      <span class="pill enter" style="--d:.9s">⭐ Telegram Bot Creator</span>
+      <span class="pill enter" data-delay="0.1">⭐ Telegram Bot Creator</span>
       <h1>
-        <span class="enter" style="--d:1s">Useful Telegram bots.</span><br>
-        <span class="enter" style="--d:1.15s">Built by <em>Ankit.</em></span>
+        <span class="enter" data-delay="0.2">Useful Telegram bots.</span><br>
+        <span class="enter" data-delay="0.3">Built by <em>Ankit.</em></span>
       </h1>
-      <p class="lead enter" style="--d:1.3s">Simple, smart bots made to make everyday tasks easier.</p>
+      <p class="lead enter" data-delay="0.4">Simple, smart bots made to make everyday tasks easier.</p>
       <div class="cta">
-        <a class="btn-primary enter" style="--d:1.45s" href="#bots">Explore My Bots →</a>
-        <a class="btn-ghost enter" style="--d:1.55s" id="ctaTg" href="#" target="_blank" rel="noopener">Join Telegram</a>
+        <a class="btn-primary enter" data-delay="0.5" href="#bots">Explore My Bots →</a>
+        <a class="btn-ghost enter" data-delay="0.55" id="ctaTg" href="#" target="_blank" rel="noopener">Join Telegram</a>
       </div>
-      <div class="live enter" style="--d:1.7s"><span class="dot"></span><span id="typed"></span><span class="caret"></span></div>
+      <div class="live enter" data-delay="0.6"><span class="dot"></span><span id="typed"></span><span class="caret"></span></div>
     </div>
 
     <div class="hero-art">
-      <div class="orbit enter keep" style="--d:.8s"></div>
-      <div class="plane enter" style="--d:1s">
+      <div class="orbit enter keep" data-delay="0.2"></div>
+      <div class="plane enter" data-delay="0.2">
         <svg viewBox="0 0 24 24"><path d="M9.8 15.2 9.6 19c.4 0 .6-.2.8-.4l2-1.9 4.1 3c.8.4 1.3.2 1.5-.7l2.7-12.7c.3-1.2-.4-1.7-1.2-1.4L2.4 10.1c-1.2.5-1.2 1.1-.2 1.4l4.2 1.3 9.7-6.1c.5-.3.9-.1.5.2z"/></svg>
       </div>
-      <div class="avatar-ring enter keep" style="--d:1.2s">
+      <div class="avatar-ring enter keep" data-delay="0.3">
         <div class="avatar-inner">
           <span id="myLetter"></span>
           <img id="myPhoto" alt="Ankit">
         </div>
       </div>
-      <div class="handle enter" style="--d:1.9s" id="handle"></div>
+      <div class="handle enter" data-delay="0.6" id="handle"></div>
     </div>
   </header>
 
-  <!-- Three widgets inspired by the last part of the reference video -->
-  <section class="desk-widgets" aria-label="Animated desk widgets">
-    <article class="desk-card">
-      <div class="buddy-face" aria-hidden="true"><span class="buddy-eye"></span><span class="buddy-eye"></span></div>
-      <h3>DESK BUDDY</h3>
-      <p>A tiny desk companion with two glowing eyes, blinking continuously.</p>
-      <span class="desk-tag">● ONLINE</span>
-    </article>
+  <section class="block" id="dash">
+    <div class="sec-head enter" data-delay="0.2"><span class="line"></span><h2>Live <em>Dashboard</em></h2></div>
+    <div class="dash-grid">
 
-    <article class="desk-card">
-      <div class="radar-gauge" aria-label="Animated radar gauge from zero to one hundred">
-        <svg viewBox="0 0 200 115" role="img" aria-hidden="true">
-          <path d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="rgba(220,230,255,.3)" stroke-width="3"/>
-          <path d="M30 100 A70 70 0 0 1 170 100" fill="none" stroke="#f4ed25" stroke-width="2" stroke-dasharray="3 5"/>
-          <path d="M48 100 A52 52 0 0 1 152 100" fill="none" stroke="rgba(244,237,37,.22)" stroke-width="2"/>
-          <g stroke="#aab5cf" stroke-width="2">
-            <line x1="20" y1="100" x2="28" y2="100"/><line x1="100" y1="20" x2="100" y2="29"/><line x1="180" y1="100" x2="172" y2="100"/>
-          </g>
-          <line id="radarNeedle" class="radar-needle" x1="100" y1="100" x2="100" y2="30" stroke="#f4ed25" stroke-width="3.5" stroke-linecap="round"/>
-          <circle cx="100" cy="100" r="6" fill="#f4ed25"/>
-        </svg>
-        <div class="radar-scale"><span>0</span><span>50</span><span>100</span></div>
-      </div>
-      <div class="radar-readout"><span id="radarValue">0</span> / 100</div>
-      <h3>DESK RADAR</h3>
-      <p>A live 0–100 meter. Its needle sweeps forward and returns endlessly.</p>
-      <span class="desk-tag">● SCANNING</span>
-    </article>
-
-    <article class="desk-card">
-      <div class="spotify-device" aria-hidden="true">
-        <div class="spotify-screen"><i></i><i></i><i></i><i></i></div>
-        <div class="spotify-bars">
-          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      <article class="dcard enter" data-delay="0.5">
+        <div class="dhead"><span class="dot"></span><span>DESK BUDDY</span></div>
+        <div class="dbody">
+          <div class="monitor">
+            <span class="light l1"></span>
+            <span class="light l2"></span>
+          </div>
+          <div class="stand"></div>
+          <div class="base"></div>
         </div>
-      </div>
-      <h3>SPOTIFY MINI</h3>
-      <p>A miniature music-style display with a continuously moving equalizer.</p>
-      <span class="desk-tag">● PLAYING</span>
-    </article>
+      </article>
+
+      <article class="dcard enter" data-delay="0.6">
+        <div class="dhead"><span class="dot"></span><span>DESK RADAR</span></div>
+        <div class="dbody">
+          <svg class="gauge-svg" viewBox="0 0 200 124" aria-hidden="true">
+            <path class="g-track" d="M20 110 A80 80 0 0 1 180 110"/>
+            <path id="garc" class="g-val" d="M20 110 A80 80 0 0 1 180 110" stroke-dasharray="251.33 251.33" stroke-dashoffset="251.33"/>
+            <g class="g-ticks" id="ticks"></g>
+            <line id="needle" class="g-needle" x1="100" y1="110" x2="100" y2="44" transform="rotate(-90 100 110)"/>
+            <circle class="g-hub" cx="100" cy="110" r="5"/>
+          </svg>
+          <div class="readout"><b id="gv">0</b><span>%</span></div>
+        </div>
+      </article>
+
+      <article class="dcard enter" data-delay="0.7">
+        <div class="dhead"><span class="dot"></span><span>SPOTIFY MINI</span></div>
+        <div class="dbody">
+          <div class="tile">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>
+          </div>
+          <div class="ptitle">NOW PLAYING</div>
+          <div class="eq" id="eq"></div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section class="block" id="telemetry">
+    <div class="sec-head enter" data-delay="0.7"><span class="line"></span><h2>System <em>Telemetry</em></h2></div>
+    <div class="dash-grid">
+      <article class="dcard enter" data-delay="0.75">
+        <div class="dhead"><span class="dot"></span><span>SPEED METER</span></div>
+        <div class="dbody">
+          <svg class="gauge-svg" viewBox="0 0 200 124" aria-hidden="true">
+            <path class="g-track" d="M20 110 A80 80 0 0 1 180 110"/>
+            <path id="sgArc" class="g-val" d="M20 110 A80 80 0 0 1 180 110" stroke-dasharray="251.33 251.33" stroke-dashoffset="251.33"/>
+            <g class="g-ticks" id="sgTicks"></g>
+            <line id="sgNeedle" class="g-needle" x1="100" y1="110" x2="100" y2="44" transform="rotate(-90 100 110)"/>
+            <circle class="g-hub" cx="100" cy="110" r="5"/>
+          </svg>
+          <div class="readout"><b id="sgVal">0</b><span>/ 100</span></div>
+        </div>
+      </article>
+      <article class="dcard enter" data-delay="0.8">
+        <div class="dhead"><span class="dot"></span><span>RADAR SCAN</span></div>
+        <div class="dbody">
+          <svg class="radar-svg" viewBox="0 0 200 200" aria-hidden="true">
+            <circle class="r-ring" cx="100" cy="100" r="90"/><circle class="r-ring" cx="100" cy="100" r="60"/><circle class="r-ring" cx="100" cy="100" r="30"/>
+            <line class="r-cross" x1="10" y1="100" x2="190" y2="100"/><line class="r-cross" x1="100" y1="10" x2="100" y2="190"/>
+            <g class="sweep"><path class="r-wedge" d="M100 100 L100 10 A90 90 0 0 1 157.9 31 Z"/><line class="r-edge" x1="100" y1="100" x2="157.9" y2="31"/></g>
+            <circle class="blip" cx="140" cy="62" r="3.5" style="animation-delay:.2s"/><circle class="blip" cx="64" cy="128" r="3" style="animation-delay:.9s"/>
+            <circle class="blip" cx="118" cy="150" r="3.5" style="animation-delay:1.4s"/><circle class="blip" cx="76" cy="58" r="3" style="animation-delay:.5s"/>
+          </svg>
+        </div>
+      </article>
+      <article class="dcard enter" data-delay="0.85">
+        <div class="dhead"><span class="dot"></span><span>SIGNAL WAVE</span></div>
+        <div class="dbody"><canvas id="waveCv"></canvas></div>
+      </article>
+      <article class="dcard enter" data-delay="0.9">
+        <div class="dhead"><span class="dot"></span><span>SYSTEM LOAD</span></div>
+        <div class="dbody">
+          <div class="stats" id="stats">
+            <div class="st"><span>CPU</span><div class="tr"><i class="fl"></i></div><em>0%</em></div>
+            <div class="st"><span>RAM</span><div class="tr"><i class="fl"></i></div><em>0%</em></div>
+            <div class="st"><span>NET</span><div class="tr"><i class="fl"></i></div><em>0%</em></div>
+            <div class="st"><span>PING</span><div class="tr"><i class="fl"></i></div><em>0%</em></div>
+          </div>
+        </div>
+      </article>
+    </div>
   </section>
 
   <section class="block" id="bots">
-    <div class="sec-head enter" style="--d:1.2s"><span class="line"></span><h2>My Telegram <em>Bots</em></h2></div>
+    <div class="sec-head enter" data-delay="0.4"><span class="line"></span><h2>My Telegram <em>Bots</em></h2></div>
     <div class="bot-grid" id="botGrid"></div>
   </section>
 
   <section class="two" id="channels">
-    <div class="panel enter" style="--d:1.4s">
+    <div class="panel enter" data-delay="0.9">
       <h3>What I <em>Build</em></h3>
       <p>Telegram automation, useful tools and bot updates.</p>
       <ul class="feat">
@@ -321,19 +388,27 @@
         <li><i>🔔</i><div><b>Bot Updates</b><span>Stay connected for updates</span></div></li>
       </ul>
     </div>
-    <div class="panel enter" style="--d:1.6s">
+    <div class="panel enter" data-delay="1">
       <h3>Join Our <em>Channels</em></h3>
       <p>Get the latest updates, new bots and important announcements.</p>
       <div id="chanList"></div>
     </div>
   </section>
 
-  <section class="block enter" id="about" style="--d:1.8s">
+  <section class="block enter" id="about" data-delay="1.1">
     <div class="sec-head"><span class="line"></span><h2>About <em>Me</em></h2></div>
     <p class="about" id="aboutText"></p>
   </section>
 
-  <footer class="enter" style="--d:2s">
+  <section class="block enter" id="terminal" data-delay="1.15">
+    <div class="sec-head"><span class="line"></span><h2>Live <em>Terminal</em></h2></div>
+    <div class="term">
+      <div class="term-bar"><i></i><i></i><i></i><span>termux - ankit@bots:~</span></div>
+      <div class="term-body" id="termBody"></div>
+    </div>
+  </section>
+
+  <footer class="enter" data-delay="1.2">
     <span><b>BOTS BY ANKIT</b> &nbsp;|&nbsp; Telegram Bot Creator</span>
     <span>© 2026 Ankit. All rights reserved.</span>
     <a id="footTg" href="#" target="_blank" rel="noopener"></a>
@@ -361,6 +436,7 @@ const CHANNELS = [
 // username: bot's @username, without @
 // bio: the bot's Bio text
 // photo: local file next to index.html (leave empty to use the bot's Telegram photo)
+// video: looping clip shown under the username (local file next to index.html)
 const BOTS = [
   { display: "𝐅𝐑𝐎𝐍𝐓 𝐌𝐄𝐃𝐈𝐀 <||>", username: "Name_style_maker_bot", bio: "Make your name stylish ✨ Tons of unique designs, cool fonts & symbols, and ready-made bios.", photo: "name-style.jpg", video: "robot-name.mp4" },
   { display: "⌁ ᖴ ᴜ s ꭵ ꭷ и",        username: "Groupsecurity_xbot",   bio: "Fusion is a group management bot that keeps your group clean, safe and organised.", photo: "group-security.jpg", video: "robot-fusion.mp4" },
@@ -369,6 +445,8 @@ const BOTS = [
 // ===============================
 
 const COLORS = ["#2f8bff", "#5ec2ff", "#7a5cff", "#2ee59d", "#e7b75a"];
+const REDUCE = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const BASE_START = 2.5; // seconds: entrance starts right after the loader
 
 function esc(s) {
   return String(s == null ? "" : s).replace(/[&<>"']/g, c =>
@@ -385,7 +463,7 @@ function avatarHTML(srcs, letter, cls) {
     onerror="const r=this.dataset.rest?this.dataset.rest.split('|'):[];if(r.length){this.dataset.rest=r.slice(1).join('|');this.src=r[0];}else{this.replaceWith(Object.assign(document.createElement('div'),{className:'av-fb',textContent:this.dataset.letter}));}">`;
 }
 
-// Gives every .enter element a random "fallen" start position
+// Gives every .enter element a scattered start position and a timing that finishes before 5s
 function prepareEnter(root) {
   root.querySelectorAll(".enter:not(.done)").forEach(el => {
     if (!el.style.getPropertyValue("--x")) {
@@ -393,7 +471,8 @@ function prepareEnter(root) {
       el.style.setProperty("--y", Math.round(rand(200, 360)) + "px");
       el.style.setProperty("--r", Math.round(rand(-25, 25)) + "deg");
     }
-    el.style.setProperty("--d", (2 + rand(0, 0.15)).toFixed(2) + "s");
+    const delay = parseFloat(el.dataset.delay || 0);
+    el.style.setProperty("--d", (BASE_START + delay + rand(0, 0.12)).toFixed(2) + "s");
   });
 }
 
@@ -419,18 +498,18 @@ function render() {
     myImg.src = "profile.jpg";
   });
 
-  // Bots
+  // Bots: photo, name, @username, looping video under the username, bio, open link
   document.getElementById("botGrid").innerHTML = BOTS.map((b, i) => {
     const color = COLORS[i % COLORS.length];
     const letter = (b.display || b.username).trim().charAt(0).toUpperCase();
     const tgPhoto = `https://t.me/i/userpic/320/${encodeURIComponent(b.username)}.jpg`;
     return `
-      <a class="bot enter" style="--c:${color};--d:${(1.2 + i * 0.12).toFixed(2)}s" href="https://t.me/${encodeURIComponent(b.username)}" target="_blank" rel="noopener">
+      <a class="bot enter" data-delay="${(0.8 + i * 0.1).toFixed(2)}" style="--c:${color}" href="https://t.me/${encodeURIComponent(b.username)}" target="_blank" rel="noopener">
         <span class="live-badge">● LIVE</span>
-        <video class="bot-media" src="${esc(b.video)}" autoplay muted loop playsinline preload="auto"></video>
         <div class="bot-av">${avatarHTML([b.photo, tgPhoto], letter, "")}</div>
         <h3>${esc(b.display)}</h3>
         <div class="uname">@${esc(b.username)}</div>
+        <video class="bot-media" src="${esc(b.video)}" autoplay muted loop playsinline preload="auto"></video>
         <p class="bio">${esc(b.bio)}</p>
         <span class="open">Open Bot →</span>
       </a>`;
@@ -446,6 +525,13 @@ function render() {
         <span class="join">Join →</span>
       </a>`;
   }).join("");
+
+  // Keep every bot video playing non-stop
+  document.querySelectorAll("video.bot-media").forEach(v => {
+    v.muted = true;
+    const p = v.play();
+    if (p && p.catch) p.catch(() => {});
+  });
 
   prepareEnter(document);
   startTyping();
@@ -476,46 +562,376 @@ function startTyping() {
   tick();
 }
 
-// Opening intro stays briefly, then reveals the unchanged website.
-function startIntro() {
-  const intro = document.getElementById("introScreen");
-  if (!intro) return;
-  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reduceMotion) {
-    intro.remove();
-    return;
-  }
-  window.setTimeout(() => {
-    intro.classList.add("hide");
-    window.setTimeout(() => intro.remove(), 950);
-  }, 3900);
-}
+// ----- Opening loader: network background + spinning dot ring + LOADING (about 2s) -----
+(function setupLoader() {
+  const loader = document.getElementById("loader");
+  if (!loader) return;
+  if (REDUCE) { loader.remove(); return; }
 
-// Desk Radar: smoothly sweeps from 0 to 100 and back forever.
-function startRadar() {
-  const needle = document.getElementById("radarNeedle");
-  const valueEl = document.getElementById("radarValue");
-  if (!needle || !valueEl) return;
-  let value = 0;
-  let direction = 1;
-  window.setInterval(() => {
-    value += direction;
-    if (value >= 100) { value = 100; direction = -1; }
-    if (value <= 0) { value = 0; direction = 1; }
-    const angle = -90 + (value * 1.8);
-    needle.style.transform = `rotate(${angle}deg)`;
-    valueEl.textContent = String(value);
-  }, 24);
-}
+  // Dotted ring around the text
+  const ring = document.getElementById("ring");
+  ring.innerHTML = Array.from({ length: 36 }, (_, k) => {
+    const a = (k / 36) * Math.PI * 2;
+    const x = 50 + 46 * Math.cos(a), y = 50 + 46 * Math.sin(a);
+    return `<i style="left:${x.toFixed(2)}%;top:${y.toFixed(2)}%;--dl:${(-(k / 36) * 1.2).toFixed(3)}s"></i>`;
+  }).join("");
+
+  // Glowing network of dots and lines
+  const canvas = document.getElementById("net");
+  const ctx = canvas.getContext("2d");
+  let W = 0, H = 0, nodes = [];
+  function size() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = canvas.clientWidth; H = canvas.clientHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const count = Math.min(90, Math.round((W * H) / 14000));
+    nodes = Array.from({ length: count }, () => ({
+      x: Math.random() * W, y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35,
+      r: 0.8 + Math.random() * 2.2
+    }));
+  }
+  size();
+  window.addEventListener("resize", size);
+
+  let running = true;
+  function frame() {
+    if (!running) return;
+    ctx.clearRect(0, 0, W, H);
+    for (const n of nodes) {
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < 0 || n.x > W) n.vx *= -1;
+      if (n.y < 0 || n.y > H) n.vy *= -1;
+    }
+    ctx.lineWidth = 1;
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const a = nodes[i], b = nodes[j];
+        const d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (d < 150) {
+          ctx.strokeStyle = `rgba(60,180,255,${((1 - d / 150) * 0.45).toFixed(3)})`;
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        }
+      }
+    }
+    for (const n of nodes) {
+      ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(120,220,255,.9)";
+      ctx.shadowColor = "#3cc8ff"; ctx.shadowBlur = 10;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // Loader finishes at 2s, then fades out; the page entrance follows at 2.5s
+  setTimeout(() => {
+    running = false;
+    loader.classList.add("leave");
+    setTimeout(() => loader.remove(), 480);
+  }, 2000);
+})();
+
+// ----- Dashboard: Desk Radar needle (0 -> 100 -> 0, continuous, never stops) -----
+(function setupRadar() {
+  const needle = document.getElementById("needle");
+  const arc = document.getElementById("garc");
+  const readout = document.getElementById("gv");
+  const ticks = document.getElementById("ticks");
+  if (!needle || !arc || !readout || !ticks) return;
+
+  ticks.innerHTML = Array.from({ length: 11 }, (_, k) =>
+    `<line x1="100" y1="34" x2="100" y2="${k % 5 === 0 ? 42 : 40}" transform="rotate(${-90 + 18 * k} 100 110)"/>`
+  ).join("");
+
+  const ARC_LEN = Math.PI * 80;
+  function paint(v) {
+    needle.setAttribute("transform", `rotate(${(-90 + v * 1.8).toFixed(2)} 100 110)`);
+    arc.style.strokeDashoffset = (ARC_LEN * (1 - v / 100)).toFixed(2);
+    readout.textContent = Math.round(v);
+  }
+  if (REDUCE) { paint(50); return; }
+
+  const PERIOD = 4; // seconds for one full 0 -> 100 -> 0 sweep
+  const start = performance.now();
+  function frame(now) {
+    const t = (now - start) / 1000;
+    const v = 50 - 50 * Math.cos((2 * Math.PI * t) / PERIOD);
+    paint(v);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+// ----- Dashboard: Spotify Mini equalizer bars (different speeds) -----
+(function setupEqualizer() {
+  const host = document.getElementById("eq");
+  if (!host) return;
+  const bars = 16;
+  host.innerHTML = Array.from({ length: bars }, (_, i) => {
+    const dur = (0.45 + ((i * 37) % 11) / 10).toFixed(2);   // 0.45s .. 1.45s
+    const delay = (((i * 53) % 7) / 10).toFixed(1);         // 0.0s .. 0.6s
+    return `<i style="--t:${dur}s;--dl:${delay}s"></i>`;
+  }).join("");
+})();
 
 render();
-startIntro();
-startRadar();
 
 // After the entrance animation ends, hand control back so hover effects work
- document.addEventListener("animationend", e => {
+document.addEventListener("animationend", e => {
   if (e.animationName === "settle" && e.target.classList && e.target.classList.contains("enter") && !e.target.classList.contains("keep")) e.target.classList.add("done");
 }, true);
+</script>
+<script>
+// ----- Telemetry: speed meter (0 -> 100 non-stop), wave, load bars -----
+(function setupTelemetry() {
+  const needle = document.getElementById("sgNeedle"), arc = document.getElementById("sgArc");
+  const val = document.getElementById("sgVal"), ticks = document.getElementById("sgTicks");
+  if (needle && arc && val && ticks) {
+    ticks.innerHTML = Array.from({ length: 11 }, (_, k) =>
+      `<line x1="100" y1="34" x2="100" y2="${k % 5 === 0 ? 42 : 40}" transform="rotate(${-90 + 18 * k} 100 110)"/>`).join("");
+    const LEN = Math.PI * 80;
+    const paint = v => {
+      needle.setAttribute("transform", `rotate(${(-90 + v * 1.8).toFixed(2)} 100 110)`);
+      arc.style.strokeDashoffset = (LEN * (1 - v / 100)).toFixed(2);
+      val.textContent = Math.round(v);
+    };
+    if (REDUCE) paint(60);
+    else {
+      const t0 = performance.now(), P = 3.4;
+      (function f(now) {
+        const p = (((now - t0) / 1000) % P) / P;
+        paint(p < 0.82 ? 100 * (p / 0.82) : 100 * (1 - (p - 0.82) / 0.18));
+        requestAnimationFrame(f);
+      })(t0);
+    }
+  }
+
+  const cv = document.getElementById("waveCv");
+  if (cv && !REDUCE) {
+    const c = cv.getContext("2d");
+    (function f(now) {
+      const d = Math.min(window.devicePixelRatio || 1, 2), w = cv.clientWidth, h = cv.clientHeight;
+      if (cv.width !== w * d) { cv.width = w * d; cv.height = h * d; }
+      c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, w, h);
+      const t = now / 1000;
+      [[1, "rgba(255,210,31,.95)", 6], [0.55, "rgba(255,210,31,.35)", 0]].forEach(([amp, col, sh], n) => {
+        c.beginPath(); c.lineWidth = 2; c.strokeStyle = col; c.shadowColor = "#ffd21f"; c.shadowBlur = sh;
+        for (let x = 0; x <= w; x += 3) {
+          const u = x / w * 9 + t * (n ? 2.2 : 3.4);
+          const y = h / 2 + amp * (Math.sin(u) * h * 0.28 + Math.sin(u * 2.7 + t) * h * 0.1 + Math.sin(u * 7.3) * h * 0.05 * Math.sin(t * 2));
+          x ? c.lineTo(x, y) : c.moveTo(x, y);
+        }
+        c.stroke();
+      });
+      requestAnimationFrame(f);
+    })(performance.now());
+  }
+
+  const rows = document.querySelectorAll("#stats .st");
+  function bump() {
+    rows.forEach(r => {
+      const v = Math.round(rand(8, 97));
+      r.querySelector(".fl").style.width = v + "%";
+      r.querySelector("em").textContent = v + "%";
+    });
+  }
+  bump(); if (!REDUCE) setInterval(bump, 1100);
+})();
+
+// ----- Terminal: code keeps running non-stop (Termux style) -----
+(function setupTerminal() {
+  const body = document.getElementById("termBody");
+  if (!body) return;
+  const MAX = 40, sleep = ms => new Promise(r => setTimeout(r, ms));
+  const n = (a, b) => Math.round(rand(a, b));
+  const cur = document.createElement("div"); cur.className = "t-cur";
+  const ct = document.createElement("span"), caret = document.createElement("span");
+  caret.className = "caret"; cur.append(ct, caret); body.appendChild(cur);
+  function add(type, text) {
+    const d = document.createElement("div"); d.className = "t-" + type; d.textContent = (type === "cmd" ? "$ " : "") + text;
+    body.insertBefore(d, cur);
+    while (body.children.length > MAX) body.removeChild(body.firstChild);
+  }
+  async function type(text) {
+    ct.textContent = "$ ";
+    for (const ch of text) { ct.textContent += ch; await sleep(rand(30, 80)); }
+    await sleep(250); ct.textContent = ""; add("cmd", text);
+  }
+  const SCRIPTS = [
+    [["cmd", "python3 bot.py"], ["info", "Connecting to Telegram API..."], ["ok", () => `Connected, ping=${n(25, 90)}ms`], ["info", "Loading plugins: security, music, tools"], ["ok", "3 plugins loaded"], ["info", () => `Polling updates, offset=${n(48000, 49999)}`]],
+    [["cmd", "tail -f logs/yuta.log"], ["info", () => `update_id=${n(40000, 59999)} chat=-100${n(100000, 999999)} text=/start`], ["info", "moderation: scanning media..."], ["ok", () => `clean, scan_time=${n(40, 180)}ms`], ["warn", "flood control: waiting 2s"], ["ok", () => `message sent in ${n(60, 220)}ms`]],
+    [["cmd", "git pull origin main"], ["info", "Fetching origin..."], ["ok", () => `${n(1, 6)} files changed, ${n(3, 90)} insertions(+)`], ["cmd", "pip install -r requirements.txt"], ["ok", "Requirement already satisfied: pyrogram"], ["ok", "Requirement already satisfied: aiohttp"]],
+    [["cmd", "pm2 restart all"], ["info", "Restarting [yuta, fusion, name-style]..."], ["ok", "[PM2] 3 processes online"], ["info", () => `memory=${n(40, 140)}MB cpu=${n(1, 18)}%`], ["cmd", "python3 deploy.py --check"], ["ok", "All systems running"]]
+  ];
+  (async function run() {
+    let i = 0;
+    for (;;) {
+      for (const [kind, text] of SCRIPTS[i++ % SCRIPTS.length]) {
+        const t = typeof text === "function" ? text() : text;
+        if (kind === "cmd") await type(t); else { add(kind, t); await sleep(rand(300, 900)); }
+      }
+      await sleep(900);
+    }
+  })();
+})();
+</script>
+<script>
+/* intro.js - 5 second entry: 0-2s LOADING, 2-3.3s neon boxes + flying letters, 3.3-5s page settles */
+(function () {
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var T0 = performance.now();
+  var LOADER = 1.9, REVEAL = 3.3;
+
+  // Overlay (sits under the existing loader, above the page)
+  var st = document.createElement("style");
+  st.textContent = ".intro{position:fixed;inset:0;z-index:900;background:#000;transition:opacity .8s ease}" +
+    ".intro.leave{opacity:0;pointer-events:none}#introCv{width:100%;height:100%;display:block}";
+  document.head.appendChild(st);
+  var box = document.createElement("div");
+  box.className = "intro";
+  box.setAttribute("aria-hidden", "true");
+  var cv = document.createElement("canvas");
+  cv.id = "introCv";
+  box.appendChild(cv);
+  document.body.appendChild(box);
+
+  // Re-time the page entrance so everything is settled by ~5s
+  document.querySelectorAll(".enter").forEach(function (el) {
+    var d = parseFloat(el.dataset.delay || 0);
+    el.style.setProperty("--d", (REVEAL + d * 0.55 + Math.random() * 0.1).toFixed(2) + "s");
+  });
+
+  var ctx = cv.getContext("2d"), W, H, shapes = [], letters = [], fs = 40;
+  function size() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  size();
+
+  function makeShapes() {
+    shapes = [];
+    var n = W < 700 ? 22 : 36, base = Math.min(W, H);
+    for (var i = 0; i < n; i++) {
+      var t = Math.random(), s = 14 + Math.pow(Math.random(), 2) * base * 0.28;
+      shapes.push({
+        x: Math.random() * W, y: Math.random() * H,
+        w: s * (0.6 + Math.random() * 0.5), h: s * (0.9 + Math.random() * 0.6),
+        k: t < 0.2 ? "c" : t < 0.35 ? "p" : "r",
+        vx: -(8 + Math.random() * 30), vy: (Math.random() - 0.5) * 8,
+        r: 6 + Math.random() * 10, a: 0.45 + Math.random() * 0.5
+      });
+    }
+  }
+
+  function layout() {
+    var h1 = document.querySelector(".hero h1");
+    if (!h1) return;
+    var rect = h1.getBoundingClientRect(), cs = getComputedStyle(h1);
+    fs = parseFloat(cs.fontSize) || 48;
+    var lh = parseFloat(cs.lineHeight) || fs * 1.08;
+    var lines = [[{ t: "Useful Telegram bots.", c: 0 }], [{ t: "Built by ", c: 0 }, { t: "Ankit.", c: 1 }]];
+    ctx.font = "800 " + fs + "px Inter, system-ui, sans-serif";
+    var widest = 0;
+    lines.forEach(function (ps) {
+      var tw = 0; ps.forEach(function (p) { tw += ctx.measureText(p.t).width; });
+      widest = Math.max(widest, tw);
+    });
+    if (widest > rect.width && rect.width > 0) { fs = fs * rect.width / widest; lh = lh * rect.width / widest; ctx.font = "800 " + fs + "px Inter, system-ui, sans-serif"; }
+    letters = [];
+    var idx = 0;
+    lines.forEach(function (ps, li) {
+      var tw = 0; ps.forEach(function (p) { p.w = ctx.measureText(p.t).width; tw += p.w; });
+      var x0 = cs.textAlign === "center" ? rect.left + (rect.width - tw) / 2 : rect.left;
+      var y = rect.top + li * lh + lh * 0.5, off = 0;
+      ps.forEach(function (p) {
+        for (var i = 0; i < p.t.length; i++) {
+          var ch = p.t.charAt(i);
+          if (ch !== " ") {
+            letters.push({
+              ch: ch, c: p.c,
+              x: x0 + off + ctx.measureText(p.t.slice(0, i)).width, y: y,
+              sx: Math.random() * W, sy: Math.random() * H, sr: (Math.random() - 0.5) * 5,
+              d: idx * 0.022 + Math.random() * 0.12
+            });
+          }
+          idx++;
+        }
+        off += p.w;
+      });
+    });
+  }
+  makeShapes();
+  layout();
+  if (document.fonts && document.fonts.load) document.fonts.load("800 40px Inter").then(layout, layout);
+  window.addEventListener("resize", function () { size(); makeShapes(); layout(); });
+
+  function ease(t) {
+    t = Math.max(0, Math.min(1, t));
+    return 1 + 2.4 * Math.pow(t - 1, 3) + 1.4 * Math.pow(t - 1, 2);
+  }
+  function rr(x, y, w, h, r) {
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h);
+  }
+
+  var last = performance.now();
+  function frame(now) {
+    var s = (now - T0) / 1000, dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    ctx.clearRect(0, 0, W, H);
+
+    // Neon boxes
+    ctx.lineWidth = 2;
+    ctx.shadowColor = "#19d3ff";
+    ctx.shadowBlur = 14;
+    shapes.forEach(function (o) {
+      o.x += o.vx * dt; o.y += o.vy * dt;
+      if (o.x + o.w < 0) o.x = W + 10;
+      if (o.y < -o.h) o.y = H; if (o.y > H + o.h) o.y = -o.h;
+      ctx.strokeStyle = "rgba(60,225,255," + o.a + ")";
+      if (o.k === "c") { ctx.beginPath(); ctx.arc(o.x, o.y, o.w / 2, 0, Math.PI * 2); }
+      else if (o.k === "p") rr(o.x, o.y, o.w * 1.6, o.h * 0.35, o.h * 0.18);
+      else rr(o.x, o.y, o.w, o.h, o.r);
+      ctx.stroke();
+    });
+
+    // Flying outline letters that settle into the heading
+    ctx.font = "800 " + fs + "px Inter, system-ui, sans-serif";
+    ctx.textBaseline = "middle";
+    ctx.lineJoin = "round";
+    ctx.lineWidth = Math.max(1.5, fs * 0.03);
+    var appear = Math.max(0, Math.min(1, (s - 1.4) / 0.5));
+    letters.forEach(function (l) {
+      var p = (s - LOADER - l.d) / 1.0, e = ease(p);
+      var x = l.sx + (l.x - l.sx) * e, y = l.sy + (l.y - l.sy) * e;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(l.sr * (1 - Math.max(0, Math.min(1, p))));
+      var sc = 0.5 + 0.5 * Math.max(0, Math.min(1, p)); ctx.scale(sc, sc);
+      ctx.globalAlpha = appear;
+      ctx.shadowColor = "#3cc8ff"; ctx.shadowBlur = 12;
+      ctx.strokeStyle = l.c ? "#5ec2ff" : "#eaf6ff";
+      ctx.strokeText(l.ch, 0, 0);
+      var fa = Math.max(0, Math.min(1, (s - 2.9 - l.d) / 0.4));
+      if (fa > 0) { ctx.globalAlpha = appear * fa; ctx.fillStyle = l.c ? "#2f8bff" : "#f3f6ff"; ctx.fillText(l.ch, 0, 0); }
+      ctx.restore();
+    });
+    ctx.shadowBlur = 0;
+
+    if (s < 4.4) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // Fade the overlay out so the real page settles in
+  setTimeout(function () { box.classList.add("leave"); }, Math.max(0, REVEAL * 1000 - (performance.now() - T0)));
+  setTimeout(function () { box.remove(); st.remove(); }, Math.max(0, (REVEAL + 1.0) * 1000 - (performance.now() - T0)));
+})();
+
 </script>
 </body>
 </html>
