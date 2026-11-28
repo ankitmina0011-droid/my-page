@@ -207,7 +207,7 @@
   .stats { width:100%; display:grid; gap:12px; }
   .st { display:grid; grid-template-columns:48px 1fr 46px; align-items:center; gap:10px; font-family:"Oswald",sans-serif; font-size:.78rem; letter-spacing:.14em; color:rgba(255,255,255,.8); }
   .st .tr { height:8px; border-radius:6px; background:rgba(255,255,255,.12); overflow:hidden; }
-  .st .fl { display:block; height:100%; width:10%; border-radius:6px; background:linear-gradient(90deg,#b88a00,var(--yellow)); box-shadow:0 0 10px rgba(255,210,31,.6); transition:width .9s ease; }
+  .st .fl { display:block; height:100%; width:10%; border-radius:6px; background:linear-gradient(90deg,#b88a00,var(--yellow)); box-shadow:0 0 10px rgba(255,210,31,.6); }
   .st em { font-style:normal; text-align:right; color:var(--yellow); font-variant-numeric:tabular-nums; }
   /* ----- Terminal frame ----- */
   .term { background:#02060f; border:1px solid var(--line); border-radius:16px; overflow:hidden; box-shadow:0 20px 60px -20px rgba(47,139,255,.35); }
@@ -215,12 +215,13 @@
   .term-bar i { width:11px; height:11px; border-radius:50%; background:#ff5f57; }
   .term-bar i:nth-child(2) { background:#febc2e; } .term-bar i:nth-child(3) { background:#28c840; }
   .term-bar span { margin-left:10px; }
-  .term-body { height:300px; padding:14px 16px; display:flex; flex-direction:column; justify-content:flex-end; overflow:hidden; font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; color:#cfe3ff; white-space:pre-wrap; word-break:break-all; }
-  .t-cmd { color:#2ee59d; }
-  .t-info::before { content:"[INFO] "; color:#5ec2ff; }
-  .t-ok::before { content:"[ OK ] "; color:#2ee59d; }
-  .t-warn::before { content:"[WARN] "; color:#ffd21f; }
+  .term-body { height:400px; padding:16px 18px; display:flex; flex-direction:column; justify-content:flex-end; overflow:hidden; font:700 clamp(15px,2.6vw,19px)/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; color:#cfe3ff; text-shadow:0 0 8px currentColor; white-space:pre-wrap; word-break:break-all; }
+  .t-info::before { content:"[INFO] "; }
+  .t-ok::before { content:"[ OK ] "; }
+  .t-err::before { content:"[FAIL] "; }
+  .t-warn::before { content:"[WARN] "; }
   .t-cur { color:#2ee59d; }
+  .term-body .caret { background:currentColor; width:10px; }
 </style>
 </head>
 <body>
@@ -658,7 +659,7 @@ function startTyping() {
   const start = performance.now();
   function frame(now) {
     const t = (now - start) / 1000;
-    const v = 50 - 50 * Math.cos((2 * Math.PI * t) / PERIOD);
+    const v = Math.max(0, Math.min(100, 50 + 40 * Math.sin(t * 1.3) + 8 * Math.sin(t * 3.7 + 1) + 4 * Math.sin(t * 9.1)));
     paint(v);
     requestAnimationFrame(frame);
   }
@@ -703,7 +704,8 @@ document.addEventListener("animationend", e => {
       const t0 = performance.now(), P = 3.4;
       (function f(now) {
         const p = (((now - t0) / 1000) % P) / P;
-        paint(p < 0.82 ? 100 * (p / 0.82) : 100 * (1 - (p - 0.82) / 0.18));
+        const tt = (now - t0) / 1000, j = 3 * Math.sin(tt * 13) + 2 * Math.sin(tt * 29);
+        paint(Math.max(0, Math.min(100, (p < 0.82 ? 100 * (p / 0.82) : 100 * (1 - (p - 0.82) / 0.18)) + j)));
         requestAnimationFrame(f);
       })(t0);
     }
@@ -731,14 +733,17 @@ document.addEventListener("animationend", e => {
   }
 
   const rows = document.querySelectorAll("#stats .st");
-  function bump() {
-    rows.forEach(r => {
-      const v = Math.round(rand(8, 97));
-      r.querySelector(".fl").style.width = v + "%";
-      r.querySelector("em").textContent = v + "%";
+  const ph = [0, 1.7, 3.1, 4.6], sp = [1.1, 0.8, 1.5, 1.9];
+  function bump(now) {
+    const t = now / 1000;
+    rows.forEach((r, i) => {
+      const v = Math.max(3, Math.min(99, 50 + 38 * Math.sin(t * sp[i] + ph[i]) + 8 * Math.sin(t * 4.3 + i) + 3 * Math.sin(t * 11 + i * 2)));
+      r.querySelector(".fl").style.width = v.toFixed(1) + "%";
+      r.querySelector("em").textContent = Math.round(v) + "%";
     });
+    if (!REDUCE) requestAnimationFrame(bump);
   }
-  bump(); if (!REDUCE) setInterval(bump, 1100);
+  requestAnimationFrame(bump);
 })();
 
 // ----- Terminal: code keeps running non-stop (Termux style) -----
@@ -750,19 +755,22 @@ document.addEventListener("animationend", e => {
   const cur = document.createElement("div"); cur.className = "t-cur";
   const ct = document.createElement("span"), caret = document.createElement("span");
   caret.className = "caret"; cur.append(ct, caret); body.appendChild(cur);
-  function add(type, text) {
-    const d = document.createElement("div"); d.className = "t-" + type; d.textContent = (type === "cmd" ? "$ " : "") + text;
+  const PAL = ["#ff4d4d", "#ff9f43", "#ffd21f", "#2ee59d", "#5ec2ff", "#7a9bff", "#c77dff", "#ff6ec7", "#ff5f57", "#00e5ff"];
+  let lastC = -1;
+  function pick() { let k; do { k = Math.floor(Math.random() * PAL.length); } while (k === lastC); lastC = k; return PAL[k]; }
+  function add(type, text, color) {
+    const d = document.createElement("div"); d.className = "t-" + type; d.style.color = color || pick(); d.textContent = (type === "cmd" ? "$ " : "") + text;
     body.insertBefore(d, cur);
     while (body.children.length > MAX) body.removeChild(body.firstChild);
   }
   async function type(text) {
-    ct.textContent = "$ ";
+    const col = pick(); cur.style.color = col; ct.textContent = "$ ";
     for (const ch of text) { ct.textContent += ch; await sleep(rand(30, 80)); }
-    await sleep(250); ct.textContent = ""; add("cmd", text);
+    await sleep(250); ct.textContent = ""; add("cmd", text, col);
   }
   const SCRIPTS = [
     [["cmd", "python3 bot.py"], ["info", "Connecting to Telegram API..."], ["ok", () => `Connected, ping=${n(25, 90)}ms`], ["info", "Loading plugins: security, music, tools"], ["ok", "3 plugins loaded"], ["info", () => `Polling updates, offset=${n(48000, 49999)}`]],
-    [["cmd", "tail -f logs/yuta.log"], ["info", () => `update_id=${n(40000, 59999)} chat=-100${n(100000, 999999)} text=/start`], ["info", "moderation: scanning media..."], ["ok", () => `clean, scan_time=${n(40, 180)}ms`], ["warn", "flood control: waiting 2s"], ["ok", () => `message sent in ${n(60, 220)}ms`]],
+    [["cmd", "tail -f logs/yuta.log"], ["info", () => `update_id=${n(40000, 59999)} chat=-100${n(100000, 999999)} text=/start`], ["info", "moderation: scanning media..."], ["ok", () => `clean, scan_time=${n(40, 180)}ms`], ["warn", "flood control: waiting 2s"], ["err", "Connection timeout, retrying..."], ["ok", "Reconnected"], ["ok", () => `message sent in ${n(60, 220)}ms`]],
     [["cmd", "git pull origin main"], ["info", "Fetching origin..."], ["ok", () => `${n(1, 6)} files changed, ${n(3, 90)} insertions(+)`], ["cmd", "pip install -r requirements.txt"], ["ok", "Requirement already satisfied: pyrogram"], ["ok", "Requirement already satisfied: aiohttp"]],
     [["cmd", "pm2 restart all"], ["info", "Restarting [yuta, fusion, name-style]..."], ["ok", "[PM2] 3 processes online"], ["info", () => `memory=${n(40, 140)}MB cpu=${n(1, 18)}%`], ["cmd", "python3 deploy.py --check"], ["ok", "All systems running"]]
   ];
